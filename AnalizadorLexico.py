@@ -3,28 +3,29 @@ import re
 # Definición de tokens y expresiones regulares
 TOKENS = [
     # Palabras clave
-    ("ENTERO", r"entero"),
-    ("DECIMAL", r"decimal"),
-    ("CADENA", r"cadena"),
-    ("BOOLEANO", r"booleano"),
-    ("SI", r"si"),
-    ("SINO", r"sino"),
-    ("MIENTRAS", r"mientras"),
-    ("PARA", r"para"),
-    ("HASTA", r"hasta"),  # Agregado
-    ("DEFINIR", r"definir"),
-    ("FUNCION", r"funcion"),  # Agregado
-    ("DEVOLVER", r"devolver"),
-    ("MOSTRAR", r"mostrar"),
-    ("ENTRADA", r"entrada"),
-    ("FIN", r"fin"),
-    ("HACER", r"hacer"),
-    ("ENTONCES", r"entonces"),
+    ("ENTERO", r"\bentero\b"),
+    ("DECIMAL", r"\bdecimal\b"),
+    ("CADENA", r"\bcadena\b"),
+    ("BOOLEANO", r"\bbooleano\b"),
+    ("SI", r"\bsi\b"),
+    ("SINO", r"\bsino\b"),
+    ("MIENTRAS", r"\bmientras\b"),
+    ("PARA", r"\bpara\b"),
+    ("REPETIR", r"\brepetir\b"),  # Agregado para DO-WHILE
+    ("HASTA", r"\bhasta\b"),  # Agregado para DO-WHILE
+    ("DEFINIR", r"\bdefinir\b"),
+    ("DEVOLVER", r"\bdevolver\b"),
+    ("MOSTRAR", r"\bmostrar\b"),
+    ("ENTRADA", r"\bentrada\b"),
+    ("FIN", r"\bfin\b"),
+    ("HACER", r"\bhacer\b"),
+    ("ENTONCES", r"\bentonces\b"),
+    ("DESDE",r"\bdesde\b"),
 
     # Operadores lógicos
-    ("Y", r"y"),
-    ("O", r"o"),
-    ("NO", r"no"),
+    ("Y", r"\by\b"),
+    ("O", r"\bo\b"),
+    ("NO", r"\bno\b"),
 
     # Operadores relacionales
     ("IGUAL", r"=="),
@@ -59,7 +60,7 @@ TOKENS = [
     # Literales
     ("LITERAL_NUMERICA", r"\d+(\.\d+)?"),  # Números enteros o decimales
     ("LITERAL_CADENA", r"\".*\""),  # Cadenas entre comillas dobles
-    ("LITERAL_BOOLEANO", r"verdadero|falso"),  # Booleanos
+    ("LITERAL_BOOLEANO", r"\bverdadero\b|\bfalso\b"),  # Booleanos
 
     # Identificadores (nombres de variables)
     ("IDENTIFICADOR", r"[a-zA-Z_][a-zA-Z0-9_]*"),
