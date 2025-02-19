@@ -1,10 +1,11 @@
 import re
 from LexicalAnalyzer.Tokens import TOKENS
+from LexicalAnalyzer.LexicalErrors import LexicalErrors
 
 class Lexer:
     def __init__(self):
         self.tokens = []
-        self.errors = []
+        self.errors = LexicalErrors()
 
     def tokenize(self, code):
         position = 0
@@ -15,12 +16,12 @@ class Lexer:
                 match = regex.match(code, position)
                 if match:
                     value = match.group(0)
-                    if token_name != "WHITESPACE":
+                    if token_name != "ESPACIO":
                         self.tokens.append((token_name, value))
                     position = match.end()
                     found = True
                     break
             if not found:
-                self.errors.append(f"Error at position {position}: '{code[position]}' not recognized")
+                self.errors.add_error(position, code[position])  # Usar la clase de errores
                 position += 1
-        return self.tokens, self.errors
+        return self.tokens, self.errors.get_errors()

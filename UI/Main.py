@@ -14,24 +14,40 @@ class CompilerApp:
         self.root = tk.Tk()
         self.root.title("Compilador en Español")
 
-        # Área de texto para ingresar el código
-        self.text_area = scrolledtext.ScrolledText(self.root, width=50, height=10)
-        self.text_area.pack()
+        # Contenedor principal
+        main_frame = tk.Frame(self.root, padx=10, pady=10)
+        main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Botón para analizar el código
-        self.analyze_button = tk.Button(self.root, text="Analizar", command=self.analyze_code)
-        self.analyze_button.pack()
+        # Área de texto para ingresar el código
+        self.text_area = scrolledtext.ScrolledText(main_frame, width=50, height=15, padx=5, pady=5)
+        self.text_area.grid(row=0, column=0, rowspan=2, padx=10, pady=10, sticky="nsew")
+
+        # Contenedor para las tablas
+        table_frame = tk.Frame(main_frame)
+        table_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
         # Tabla para mostrar los tokens
-        self.token_list = ttk.Treeview(self.root, columns=("Tipo", "Valor"), show="headings")
+        self.token_list = ttk.Treeview(table_frame, columns=("Tipo", "Valor"), show="headings", height=10)
         self.token_list.heading("Tipo", text="Tipo de Token")
         self.token_list.heading("Valor", text="Valor")
-        self.token_list.pack()
+        self.token_list.column("Tipo", width=150, anchor="center")
+        self.token_list.column("Valor", width=200, anchor="w")
+        self.token_list.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Tabla para mostrar errores
-        self.error_list = ttk.Treeview(self.root, columns=("Error",), show="headings")
+        self.error_list = ttk.Treeview(table_frame, columns=("Error",), show="headings", height=10)
         self.error_list.heading("Error", text="Errores")
-        self.error_list.pack()
+        self.error_list.column("Error", width=350, anchor="w")
+        self.error_list.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        # Botón para analizar el código
+        self.analyze_button = tk.Button(main_frame, text="Analizar", command=self.analyze_code)
+        self.analyze_button.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+
+        # Configurar la distribución del grid
+        main_frame.columnconfigure(0, weight=1)
+        main_frame.columnconfigure(1, weight=1)
+        main_frame.rowconfigure(0, weight=1)
 
     def analyze_code(self):
         code = self.text_area.get("1.0", tk.END).strip()
@@ -52,7 +68,7 @@ class CompilerApp:
         # Mostrar errores
         self.error_list.delete(*self.error_list.get_children())
         for error in lex_errors + syntax_errors:
-            self.error_list.insert("", tk.END, values=(error,))
+            self.error_list.insert("", tk.END, values=(f"  {error}  ",))  # Agregar espacios en blanco
 
     def run(self):
         self.root.mainloop()
