@@ -40,52 +40,55 @@ class Parser:
         return self.errors
 
     def parse_if(self):
-        estados = ["q0", "q1", "q2", "q3", "q4", "q5", "q6"]
+        estados = ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7"]
         estado_actual = "q0"
 
         while self.position < len(self.tokens):
             token_type, value = self.tokens[self.position]
 
-        if estado_actual == "q0" and token_type == "SI":
-            estado_actual = "q1"
-        elif estado_actual == "q1" and token_type in [
-            "IDENTIFICADOR",
-            "LITERAL_NUMERICA",
-        ]:
-            estado_actual = "q2"
-        elif estado_actual == "q2" and token_type in [
-            "IGUAL",
-            "DIFERENTE",
-            "MAYOR",
-            "MENOR",
-            "MAYOR_IGUAL",
-            "MENOR_IGUAL",
-        ]:
-            estado_actual = "q3"
+            if estado_actual == "q0" and token_type == "SI":
+                estado_actual = "q1"
 
-        elif estado_actual == "q3" and token_type in [
-            "IDENTIFICADOR",
-            "LITERAL_NUMERICA",
-        ]:
-            estado_actual = "q4"
+            elif estado_actual == "q1" and token_type in ["IDENTIFICADOR", "LITERAL_NUMERICA"]:
+                estado_actual = "q2"
 
-        elif estado_actual == "q4" and token_type == "ENTONCES":
-            estado_actual = "q5"
+            elif estado_actual == "q2" and token_type in ["IGUAL", "DIFERENTE", "MAYOR", "MENOR", "MAYOR_IGUAL", "MENOR_IGUAL"]:
+                estado_actual = "q3"
 
-        elif estado_actual == "q5":
-            if token_type == "FIN":
-                estado_actual = "q6"
-            return  # Fin del bloque
-        else:
-            self.errors.append(
-                f"Error de sintaxis en la estructura 'si' en posición {self.position}"
-            )
-            return
+            elif estado_actual == "q3" and token_type in ["IDENTIFICADOR", "LITERAL_NUMERICA"]:
+                estado_actual = "q4"
 
-        self.position += 1  # Avanzar al siguiente token
+            elif estado_actual == "q4" and token_type == "ENTONCES":
+                estado_actual = "q5"
+                self.position += 1  # ✅ Avanzar después de "ENTONCES"
+                continue  
 
-        if estado_actual != "q6":
+            elif estado_actual == "q5":  # Procesar el cuerpo del IF
+                if token_type == "FIN":
+                    estado_actual = "q7"
+                    break  # ✅ Finaliza el bloque IF
+                elif token_type == "SINO":
+                    estado_actual = "q6"
+                    self.position += 1  # ✅ Avanzar después de "SINO"
+                    continue  
+                else:
+                    self.parse_statement()  # ✅ Permitir cualquier código dentro del IF
+
+            elif estado_actual == "q6":  # Procesar el bloque del ELSE
+                if token_type == "FIN":
+                    estado_actual = "q7"
+                    break  # ✅ Finaliza el bloque ELSE
+                else:
+                    self.parse_statement()  # ✅ Permitir cualquier código dentro del ELSE
+
+            self.position += 1  # ✅ Avanzar al siguiente token
+
+        if estado_actual not in ["q7"]:
             self.errors.append("Error: Estructura 'si' incompleta, falta 'fin'")
+
+
+
+
 
     def parse_for(self):
         estados = ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"]
@@ -383,15 +386,48 @@ class Parser:
                 estado_actual = "q1"
             elif estado_actual == "q1" and token_type == "ASIGNACION":
                 estado_actual = "q2"
-            elif estado_actual == "q2" and token_type == "ENTRADA":
+            elif estado_actual == "q2" and token_type in ["LITERAL_NUMERICA", "LITERAL_CADENA", "LITERAL_BOOLEANO", "ENTRADA", "IDENTIFICADOR"]:
                 estado_actual = "q3"
-                break
+                self.position += 1  
+                return True
             else:
-                self.errors.append(
-                    f"Error de sintaxis en la asignación en posición {self.position}"
-                )
-                break
+                self.errors.append(f"Error de sintaxis en la asignación en posición {self.position}")
+                return False
+
             self.position += 1
 
         if estado_actual != "q3":
-            self.errors.append("Error: Asignación incompleta, falta 'entrada()'")
+            self.errors.append("Error: Asignación incompleta, falta un valor válido.")
+
+            
+    def parse_statement(self):
+        if self.position >= len(self.tokens):
+            return
+
+        token_type, value = self.tokens[self.position]
+
+        if token_type == "IDENTIFICADOR":  # Puede ser una asignación
+            if not self.parse_assignment():
+                self.errors.append(f"Error de sintaxis en la asignación en posición {self.position}")
+        elif token_type in ["ENTERO", "DECIMAL", "CADENA", "BOOLEANO"]:  # Declaración de variable
+            if not self.parse_variable_declaration():
+                self.errors.append(f"Error en la declaración de variable en posición {self.position}")
+        elif token_type == "MOSTRAR":
+            if not self.parse_print():
+                self.errors.append(f"Error en la instrucción 'mostrar' en posición {self.position}")
+        elif token_type == "MIENTRAS":
+            self.parse_while()
+        elif token_type == "PARA":
+            self.parse_for()
+        elif token_type == "SI":
+            self.parse_if()  # Permite if anidados
+        elif token_type == "DEVOLVER":
+            self.parse_return()
+        elif token_type == "ENTRADA":
+            self.parse_input()
+        else:
+            self.errors.append(f"Error de sintaxis en la instrucción en posición {self.position}")
+
+        self.position += 1  # Avanzar al siguiente token solo si se procesó una instrucción
+
+
