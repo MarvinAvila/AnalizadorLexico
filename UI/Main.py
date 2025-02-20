@@ -6,8 +6,8 @@ from tkinter import ttk, scrolledtext
 # Agregar la ruta del proyecto para importar los módulos
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from LexicalAnalyzer.Lexer import Lexer
-from SyntaxAnalyzer.Parser import Parser
+from LexicalAnalyzer.Lexer import lexer  
+from SyntaxAnalyzer.Parser import parser 
 
 class CompilerApp:
     def __init__(self):
@@ -51,19 +51,24 @@ class CompilerApp:
 
     def analyze_code(self):
         code = self.text_area.get("1.0", tk.END).strip()
-        
-        # Análisis léxico
-        lexer = Lexer()
-        tokens, lex_errors = lexer.tokenize(code)
+
+        lexer.input(code)
+        tokens = []
+        lex_errors = []
+
+        for tok in lexer:
+            tokens.append((tok.type, tok.value))
+
+        syntax_errors = []
+        try:
+            parser.parse(code)
+        except Exception as e:
+            syntax_errors.append(str(e))  # Capturar errores de PLY
 
         # Mostrar tokens
         self.token_list.delete(*self.token_list.get_children())
         for token in tokens:
             self.token_list.insert("", tk.END, values=token)
-
-        # Análisis sintáctico
-        parser = Parser(tokens)
-        syntax_errors = parser.parse()
 
         # Mostrar errores
         self.error_list.delete(*self.error_list.get_children())

@@ -1,0 +1,103 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> expresion
+Rule 1     expresion -> LITERAL_ENTERO
+Rule 2     expresion -> LITERAL_DECIMAL
+Rule 3     expresion -> LITERAL_CADENA
+Rule 4     expresion -> LITERAL_BOOLEANO
+Rule 5     expresion -> IDENTIFICADOR
+Rule 6     declaracion -> TIPO IDENTIFICADOR PUNTO_COMA
+Rule 7     declaracion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+Rule 8     constante -> TIPO IDENTIFICADOR ASIGNACION expresion
+Rule 9     asignacion -> IDENTIFICADOR ASIGNACION expresion
+Rule 10    programa -> declaraciones
+Rule 11    declaraciones -> declaraciones declaracion
+Rule 12    declaraciones -> declaraciones constante
+Rule 13    declaraciones -> declaraciones asignacion
+Rule 14    declaraciones -> declaracion
+Rule 15    declaraciones -> constante
+Rule 16    declaraciones -> asignacion
+Rule 17    declaraciones -> declaraciones PUNTO_COMA
+
+Terminals, with rules where they appear
+
+ASIGNACION           : 7 8 9
+IDENTIFICADOR        : 5 6 7 8 9
+LITERAL_BOOLEANO     : 4
+LITERAL_CADENA       : 3
+LITERAL_DECIMAL      : 2
+LITERAL_ENTERO       : 1
+PUNTO_COMA           : 6 7 17
+TIPO                 : 6 7 8
+error                : 
+
+Nonterminals, with rules where they appear
+
+asignacion           : 13 16
+constante            : 12 15
+declaracion          : 11 14
+declaraciones        : 10 11 12 13 17
+expresion            : 7 8 9 0
+programa             : 
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . expresion
+    (1) expresion -> . LITERAL_ENTERO
+    (2) expresion -> . LITERAL_DECIMAL
+    (3) expresion -> . LITERAL_CADENA
+    (4) expresion -> . LITERAL_BOOLEANO
+    (5) expresion -> . IDENTIFICADOR
+
+    LITERAL_ENTERO  shift and go to state 2
+    LITERAL_DECIMAL shift and go to state 3
+    LITERAL_CADENA  shift and go to state 4
+    LITERAL_BOOLEANO shift and go to state 5
+    IDENTIFICADOR   shift and go to state 6
+
+    expresion                      shift and go to state 1
+
+state 1
+
+    (0) S' -> expresion .
+
+
+
+state 2
+
+    (1) expresion -> LITERAL_ENTERO .
+
+    $end            reduce using rule 1 (expresion -> LITERAL_ENTERO .)
+
+
+state 3
+
+    (2) expresion -> LITERAL_DECIMAL .
+
+    $end            reduce using rule 2 (expresion -> LITERAL_DECIMAL .)
+
+
+state 4
+
+    (3) expresion -> LITERAL_CADENA .
+
+    $end            reduce using rule 3 (expresion -> LITERAL_CADENA .)
+
+
+state 5
+
+    (4) expresion -> LITERAL_BOOLEANO .
+
+    $end            reduce using rule 4 (expresion -> LITERAL_BOOLEANO .)
+
+
+state 6
+
+    (5) expresion -> IDENTIFICADOR .
+
+    $end            reduce using rule 5 (expresion -> IDENTIFICADOR .)
+

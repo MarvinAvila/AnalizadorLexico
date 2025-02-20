@@ -1,27 +1,66 @@
-import re
-from LexicalAnalyzer.Tokens import TOKENS
-from LexicalAnalyzer.LexicalErrors import LexicalErrors
+import ply.lex as lex
 
-class Lexer:
-    def __init__(self):
-        self.tokens = []
-        self.errors = LexicalErrors()
+# ------------------------ Definición de Tokens ------------------------
 
-    def tokenize(self, code):
-        position = 0
-        while position < len(code):
-            found = False
-            for token_name, token_regex in TOKENS:
-                regex = re.compile(token_regex)
-                match = regex.match(code, position)
-                if match:
-                    value = match.group(0)
-                    if token_name != "ESPACIO":
-                        self.tokens.append((token_name, value))
-                    position = match.end()
-                    found = True
-                    break
-            if not found:
-                self.errors.add_error(position, code[position])  # Usar la clase de errores
-                position += 1
-        return self.tokens, self.errors.get_errors()
+tokens = [
+    'LITERAL_ENTERO',
+    'LITERAL_DECIMAL',
+    'LITERAL_CADENA',
+    'LITERAL_BOOLEANO',
+    'IDENTIFICADOR',
+    'TIPO',
+    'ASIGNACION',
+    'PUNTO_COMA'
+]
+
+# 🔹 Definir `;` como token válido
+t_PUNTO_COMA = r';'
+
+# 🔹 Tipos de Datos (entero, decimal, cadena, booleano)
+def t_TIPO(t):
+    r'\b(entero|decimal|cadena|booleano)\b'
+    return t
+
+
+# 🔹 Números decimales
+def t_LITERAL_DECIMAL(t):
+    r'\d+\.\d+'
+    t.value = ("DECIMAL", float(t.value))
+    return t
+
+# 🔹 Números enteros
+def t_LITERAL_ENTERO(t):
+    r'\d+'
+    t.value = ("ENTERO", int(t.value))
+    return t
+
+# 🔹 Cadenas de texto entre comillas
+def t_LITERAL_CADENA(t):
+    r'"[^"]*"'  # 🔥 Coincide con cualquier texto entre comillas dobles
+    t.value = ("CADENA", t.value)
+    return t
+
+# 🔹 Booleanos (verdadero, falso)
+def t_LITERAL_BOOLEANO(t):
+    r'\b(verdadero|falso)\b'  # 🔥 Coincide con "verdadero" o "falso"
+    t.value = ("BOOLEANO", t.value)
+    return t
+
+# 🔹 Identificadores (nombres de variables)
+def t_IDENTIFICADOR(t):
+    r'[a-zA-Z_][a-zA-Z0-9_]*'
+    return t
+
+# 🔹 Asignación "="
+t_ASIGNACION = r'='
+
+# 🔹 Ignorar espacios en blanco
+t_ignore = ' \t\n'
+
+# ------------------------ Manejo de Errores ------------------------
+
+def t_error(t):
+    print(f"❌ Error léxico: Carácter inesperado '{t.value[0]}'")
+    t.lexer.skip(1)
+
+lexer = lex.lex()
