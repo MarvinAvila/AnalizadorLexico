@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'ASIGNACION IDENTIFICADOR LITERAL_BOOLEANO LITERAL_CADENA LITERAL_DECIMAL LITERAL_ENTERO PUNTO_COMA TIPOexpresion : LITERAL_ENTERO\n| LITERAL_DECIMAL\n| LITERAL_CADENA\n| LITERAL_BOOLEANO\n| IDENTIFICADORdeclaracion : TIPO IDENTIFICADOR PUNTO_COMA\n| TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMAconstante : TIPO IDENTIFICADOR ASIGNACION expresionasignacion : IDENTIFICADOR ASIGNACION expresionprograma : declaracionesdeclaraciones : declaraciones declaracion\n| declaraciones constante\n| declaraciones asignacion\n| declaracion\n| constante\n| asignacion\n| declaraciones PUNTO_COMA'
+_lr_signature = 'programaleftANDORleftSUMARESTAleftMULTIPLICACIONDIVISIONrightNOTleftASIGNACIONleftPUNTO_COMAAND ASIGNACION COMA CON_PASO DESDE DIVISION ENTONCES FIN FIN_MIENTRAS FIN_PARA FIN_SI HACER HASTA HASTA_QUE IDENTIFICADOR INICIO LITERAL_BOOLEANO LITERAL_CADENA LITERAL_DECIMAL LITERAL_ENTERO MIENTRAS MOSTRAR MULTIPLICACION NOT OR PARA PARENTESIS_DER PARENTESIS_IZQ PUNTO_COMA REPETIR RESTA SI SINO SUMA TIPOprograma : INICIO declaraciones FINdeclaraciones : declaraciones declaracion_simple\n| declaraciones declaracion_con_asignacion\n| declaraciones constante\n| declaraciones asignacion\n| declaraciones sentencia_if\n| declaraciones sentencia_mientras\n| declaraciones sentencia_para\n| declaraciones sentencia_repetir\n| declaraciones sentencia_mostrar\n| emptyempty :sentencia_if : SI expresion ENTONCES declaraciones FIN_SI\n| SI expresion ENTONCES declaraciones SINO declaraciones FIN_SIsentencia_mientras : MIENTRAS expresion HACER declaraciones FIN_MIENTRASsentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA\n| PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA\nsentencia_repetir : REPETIR declaraciones HASTA_QUE expresionsentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMAexpresion : LITERAL_ENTERO\n| LITERAL_DECIMAL\n| LITERAL_CADENA\n| LITERAL_BOOLEANO\n| IDENTIFICADOR\n| expresion SUMA expresion\n| expresion RESTA expresion\n| expresion MULTIPLICACION expresion\n| expresion DIVISION expresion\n| expresion AND expresion\n| expresion OR expresion\n| NOT expresionlista_expresiones : lista_expresiones COMA expresion\n| expresiondeclaracion_simple : TIPO IDENTIFICADOR PUNTO_COMAdeclaracion_con_asignacion : TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMAasignacion : IDENTIFICADOR ASIGNACION expresion PUNTO_COMAconstante : TIPO IDENTIFICADOR ASIGNACION expresion'
     
-_lr_action_items = {'LITERAL_ENTERO':([0,],[2,]),'LITERAL_DECIMAL':([0,],[3,]),'LITERAL_CADENA':([0,],[4,]),'LITERAL_BOOLEANO':([0,],[5,]),'IDENTIFICADOR':([0,],[6,]),'$end':([1,2,3,4,5,6,],[0,-1,-2,-3,-4,-5,]),}
+_lr_action_items = {'INICIO':([0,],[2,]),'$end':([1,5,],[0,-1,]),'FIN':([2,3,4,6,7,8,9,10,11,12,13,14,25,26,27,28,29,36,46,50,52,53,55,56,57,58,59,60,63,65,66,68,72,77,80,],[-12,5,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-20,-21,-22,-23,-24,-34,-31,-19,-37,-36,-25,-26,-27,-28,-29,-30,-18,-35,-13,-15,-14,-16,-17,]),'TIPO':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,15,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,15,-34,-12,-31,-12,-19,-37,-36,15,-25,-26,-27,-28,-29,-30,15,-18,-35,-13,-12,-15,15,-14,-12,15,-16,-12,15,-17,]),'IDENTIFICADOR':([2,3,4,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,23,25,26,27,28,29,30,33,36,37,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,69,70,72,73,74,75,77,78,79,80,],[-12,16,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,22,29,29,32,-12,29,29,-20,-21,-22,-23,-24,29,16,-34,29,-12,29,29,29,29,29,29,-31,-12,29,29,-19,29,-37,-36,16,-25,-26,-27,-28,-29,-30,16,-18,-35,-13,-12,-15,29,16,-14,-12,29,16,-16,-12,16,-17,]),'SI':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,17,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,17,-34,-12,-31,-12,-19,-37,-36,17,-25,-26,-27,-28,-29,-30,17,-18,-35,-13,-12,-15,17,-14,-12,17,-16,-12,17,-17,]),'MIENTRAS':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,18,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,18,-34,-12,-31,-12,-19,-37,-36,18,-25,-26,-27,-28,-29,-30,18,-18,-35,-13,-12,-15,18,-14,-12,18,-16,-12,18,-17,]),'PARA':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,19,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,19,-34,-12,-31,-12,-19,-37,-36,19,-25,-26,-27,-28,-29,-30,19,-18,-35,-13,-12,-15,19,-14,-12,19,-16,-12,19,-17,]),'REPETIR':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,20,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,20,-34,-12,-31,-12,-19,-37,-36,20,-25,-26,-27,-28,-29,-30,20,-18,-35,-13,-12,-15,20,-14,-12,20,-16,-12,20,-17,]),'MOSTRAR':([2,3,4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,39,46,47,50,52,53,54,55,56,57,58,59,60,61,63,65,66,67,68,70,72,73,75,77,78,79,80,],[-12,21,-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,21,-34,-12,-31,-12,-19,-37,-36,21,-25,-26,-27,-28,-29,-30,21,-18,-35,-13,-12,-15,21,-14,-12,21,-16,-12,21,-17,]),'HASTA_QUE':([4,6,7,8,9,10,11,12,13,14,20,25,26,27,28,29,33,36,46,50,52,53,55,56,57,58,59,60,63,65,66,68,72,77,80,],[-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-20,-21,-22,-23,-24,49,-34,-31,-19,-37,-36,-25,-26,-27,-28,-29,-30,-18,-35,-13,-15,-14,-16,-17,]),'FIN_SI':([4,6,7,8,9,10,11,12,13,14,25,26,27,28,29,36,39,46,50,52,53,54,55,56,57,58,59,60,63,65,66,67,68,70,72,77,80,],[-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-20,-21,-22,-23,-24,-34,-12,-31,-19,-37,-36,66,-25,-26,-27,-28,-29,-30,-18,-35,-13,-12,-15,72,-14,-16,-17,]),'SINO':([4,6,7,8,9,10,11,12,13,14,25,26,27,28,29,36,39,46,50,52,53,54,55,56,57,58,59,60,63,65,66,68,72,77,80,],[-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-20,-21,-22,-23,-24,-34,-12,-31,-19,-37,-36,67,-25,-26,-27,-28,-29,-30,-18,-35,-13,-15,-14,-16,-17,]),'FIN_MIENTRAS':([4,6,7,8,9,10,11,12,13,14,25,26,27,28,29,36,46,47,50,52,53,55,56,57,58,59,60,61,63,65,66,68,72,77,80,],[-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-20,-21,-22,-23,-24,-34,-31,-12,-19,-37,-36,-25,-26,-27,-28,-29,-30,68,-18,-35,-13,-15,-14,-16,-17,]),'FIN_PARA':([4,6,7,8,9,10,11,12,13,14,25,26,27,28,29,36,46,50,52,53,55,56,57,58,59,60,63,65,66,68,72,73,75,77,78,79,80,],[-11,-2,-3,-4,-5,-6,-7,-8,-9,-10,-20,-21,-22,-23,-24,-34,-31,-19,-37,-36,-25,-26,-27,-28,-29,-30,-18,-35,-13,-15,-14,-12,77,-16,-12,80,-17,]),'ASIGNACION':([16,22,],[23,37,]),'LITERAL_ENTERO':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,]),'LITERAL_DECIMAL':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,]),'LITERAL_CADENA':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,]),'LITERAL_BOOLEANO':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,]),'NOT':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,]),'PUNTO_COMA':([22,25,26,27,28,29,34,35,38,46,52,55,56,57,58,59,60,64,],[36,-20,-21,-22,-23,-24,50,-33,53,-31,65,-25,-26,-27,-28,-29,-30,-32,]),'ENTONCES':([24,25,26,27,28,29,46,55,56,57,58,59,60,],[39,-20,-21,-22,-23,-24,-31,-25,-26,-27,-28,-29,-30,]),'SUMA':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[40,-20,-21,-22,-23,-24,40,40,40,-31,40,-25,-26,-27,-28,40,40,40,40,40,40,40,]),'RESTA':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[41,-20,-21,-22,-23,-24,41,41,41,-31,41,-25,-26,-27,-28,41,41,41,41,41,41,41,]),'MULTIPLICACION':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[42,-20,-21,-22,-23,-24,42,42,42,-31,42,42,42,-27,-28,42,42,42,42,42,42,42,]),'DIVISION':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[43,-20,-21,-22,-23,-24,43,43,43,-31,43,43,43,-27,-28,43,43,43,43,43,43,43,]),'AND':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[44,-20,-21,-22,-23,-24,44,44,44,-31,44,-25,-26,-27,-28,-29,-30,44,44,44,44,44,]),'OR':([24,25,26,27,28,29,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,],[45,-20,-21,-22,-23,-24,45,45,45,-31,45,-25,-26,-27,-28,-29,-30,45,45,45,45,45,]),'HACER':([25,26,27,28,29,31,46,55,56,57,58,59,60,71,76,],[-20,-21,-22,-23,-24,47,-31,-25,-26,-27,-28,-29,-30,73,78,]),'COMA':([25,26,27,28,29,34,35,46,55,56,57,58,59,60,64,],[-20,-21,-22,-23,-24,51,-33,-31,-25,-26,-27,-28,-29,-30,-32,]),'HASTA':([25,26,27,28,29,46,55,56,57,58,59,60,62,],[-20,-21,-22,-23,-24,-31,-25,-26,-27,-28,-29,-30,69,]),'CON_PASO':([25,26,27,28,29,46,55,56,57,58,59,60,71,],[-20,-21,-22,-23,-24,-31,-25,-26,-27,-28,-29,-30,74,]),'DESDE':([32,],[48,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'expresion':([0,],[1,]),}
+_lr_goto_items = {'programa':([0,],[1,]),'declaraciones':([2,20,39,47,67,73,78,],[3,33,54,61,70,75,79,]),'empty':([2,20,39,47,67,73,78,],[4,4,4,4,4,4,4,]),'declaracion_simple':([3,33,54,61,70,75,79,],[6,6,6,6,6,6,6,]),'declaracion_con_asignacion':([3,33,54,61,70,75,79,],[7,7,7,7,7,7,7,]),'constante':([3,33,54,61,70,75,79,],[8,8,8,8,8,8,8,]),'asignacion':([3,33,54,61,70,75,79,],[9,9,9,9,9,9,9,]),'sentencia_if':([3,33,54,61,70,75,79,],[10,10,10,10,10,10,10,]),'sentencia_mientras':([3,33,54,61,70,75,79,],[11,11,11,11,11,11,11,]),'sentencia_para':([3,33,54,61,70,75,79,],[12,12,12,12,12,12,12,]),'sentencia_repetir':([3,33,54,61,70,75,79,],[13,13,13,13,13,13,13,]),'sentencia_mostrar':([3,33,54,61,70,75,79,],[14,14,14,14,14,14,14,]),'expresion':([17,18,21,23,30,37,40,41,42,43,44,45,48,49,51,69,74,],[24,31,35,38,46,52,55,56,57,58,59,60,62,63,64,71,76,]),'lista_expresiones':([21,],[34,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,22 +26,42 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> expresion","S'",1,None,None,None),
-  ('expresion -> LITERAL_ENTERO','expresion',1,'p_expresion','Parser.py',10),
-  ('expresion -> LITERAL_DECIMAL','expresion',1,'p_expresion','Parser.py',11),
-  ('expresion -> LITERAL_CADENA','expresion',1,'p_expresion','Parser.py',12),
-  ('expresion -> LITERAL_BOOLEANO','expresion',1,'p_expresion','Parser.py',13),
-  ('expresion -> IDENTIFICADOR','expresion',1,'p_expresion','Parser.py',14),
-  ('declaracion -> TIPO IDENTIFICADOR PUNTO_COMA','declaracion',3,'p_declaracion','Parser.py',30),
-  ('declaracion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA','declaracion',5,'p_declaracion','Parser.py',31),
-  ('constante -> TIPO IDENTIFICADOR ASIGNACION expresion','constante',4,'p_constante','Parser.py',52),
-  ('asignacion -> IDENTIFICADOR ASIGNACION expresion','asignacion',3,'p_asignacion','Parser.py',72),
-  ('programa -> declaraciones','programa',1,'p_programa','Parser.py',117),
-  ('declaraciones -> declaraciones declaracion','declaraciones',2,'p_declaraciones','Parser.py',121),
-  ('declaraciones -> declaraciones constante','declaraciones',2,'p_declaraciones','Parser.py',122),
-  ('declaraciones -> declaraciones asignacion','declaraciones',2,'p_declaraciones','Parser.py',123),
-  ('declaraciones -> declaracion','declaraciones',1,'p_declaraciones','Parser.py',124),
-  ('declaraciones -> constante','declaraciones',1,'p_declaraciones','Parser.py',125),
-  ('declaraciones -> asignacion','declaraciones',1,'p_declaraciones','Parser.py',126),
-  ('declaraciones -> declaraciones PUNTO_COMA','declaraciones',2,'p_declaraciones','Parser.py',127),
+  ("S' -> programa","S'",1,None,None,None),
+  ('programa -> INICIO declaraciones FIN','programa',3,'p_programa','Parser.py',18),
+  ('declaraciones -> declaraciones declaracion_simple','declaraciones',2,'p_declaraciones','Parser.py',27),
+  ('declaraciones -> declaraciones declaracion_con_asignacion','declaraciones',2,'p_declaraciones','Parser.py',28),
+  ('declaraciones -> declaraciones constante','declaraciones',2,'p_declaraciones','Parser.py',29),
+  ('declaraciones -> declaraciones asignacion','declaraciones',2,'p_declaraciones','Parser.py',30),
+  ('declaraciones -> declaraciones sentencia_if','declaraciones',2,'p_declaraciones','Parser.py',31),
+  ('declaraciones -> declaraciones sentencia_mientras','declaraciones',2,'p_declaraciones','Parser.py',32),
+  ('declaraciones -> declaraciones sentencia_para','declaraciones',2,'p_declaraciones','Parser.py',33),
+  ('declaraciones -> declaraciones sentencia_repetir','declaraciones',2,'p_declaraciones','Parser.py',34),
+  ('declaraciones -> declaraciones sentencia_mostrar','declaraciones',2,'p_declaraciones','Parser.py',35),
+  ('declaraciones -> empty','declaraciones',1,'p_declaraciones','Parser.py',36),
+  ('empty -> <empty>','empty',0,'p_empty','Parser.py',44),
+  ('sentencia_if -> SI expresion ENTONCES declaraciones FIN_SI','sentencia_if',5,'p_sentencia_if','Parser.py',51),
+  ('sentencia_if -> SI expresion ENTONCES declaraciones SINO declaraciones FIN_SI','sentencia_if',7,'p_sentencia_if','Parser.py',52),
+  ('sentencia_mientras -> MIENTRAS expresion HACER declaraciones FIN_MIENTRAS','sentencia_mientras',5,'p_sentencia_mientras','Parser.py',67),
+  ('sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA','sentencia_para',9,'p_sentencia_para','Parser.py',79),
+  ('sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA','sentencia_para',11,'p_sentencia_para','Parser.py',80),
+  ('sentencia_repetir -> REPETIR declaraciones HASTA_QUE expresion','sentencia_repetir',4,'p_sentencia_repetir','Parser.py',101),
+  ('sentencia_mostrar -> MOSTRAR lista_expresiones PUNTO_COMA','sentencia_mostrar',3,'p_sentencia_mostrar','Parser.py',113),
+  ('expresion -> LITERAL_ENTERO','expresion',1,'p_expresion','Parser.py',123),
+  ('expresion -> LITERAL_DECIMAL','expresion',1,'p_expresion','Parser.py',124),
+  ('expresion -> LITERAL_CADENA','expresion',1,'p_expresion','Parser.py',125),
+  ('expresion -> LITERAL_BOOLEANO','expresion',1,'p_expresion','Parser.py',126),
+  ('expresion -> IDENTIFICADOR','expresion',1,'p_expresion','Parser.py',127),
+  ('expresion -> expresion SUMA expresion','expresion',3,'p_expresion','Parser.py',128),
+  ('expresion -> expresion RESTA expresion','expresion',3,'p_expresion','Parser.py',129),
+  ('expresion -> expresion MULTIPLICACION expresion','expresion',3,'p_expresion','Parser.py',130),
+  ('expresion -> expresion DIVISION expresion','expresion',3,'p_expresion','Parser.py',131),
+  ('expresion -> expresion AND expresion','expresion',3,'p_expresion','Parser.py',132),
+  ('expresion -> expresion OR expresion','expresion',3,'p_expresion','Parser.py',133),
+  ('expresion -> NOT expresion','expresion',2,'p_expresion','Parser.py',134),
+  ('lista_expresiones -> lista_expresiones COMA expresion','lista_expresiones',3,'p_lista_expresiones','Parser.py',167),
+  ('lista_expresiones -> expresion','lista_expresiones',1,'p_lista_expresiones','Parser.py',168),
+  ('declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA','declaracion_simple',3,'p_declaracion_simple','Parser.py',179),
+  ('declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA','declaracion_con_asignacion',5,'p_declaracion_con_asignacion','Parser.py',190),
+  ('asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA','asignacion',4,'p_asignacion','Parser.py',213),
+  ('constante -> TIPO IDENTIFICADOR ASIGNACION expresion','constante',4,'p_constante','Parser.py',235),
 ]
