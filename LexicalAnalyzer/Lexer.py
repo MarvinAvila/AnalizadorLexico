@@ -42,6 +42,12 @@ tokens = [
     "OR",
     "NOT",
     "COMA",
+    "MAYOR_QUE",       
+    "MENOR_QUE",       
+    "MAYOR_IGUAL",     
+    "MENOR_IGUAL",     
+    "IGUAL_IGUAL",     
+    "DIFERENTE",       
 ] + list(reserved.values())
 
 
@@ -113,6 +119,14 @@ t_DIVISION = r'/'
 t_AND = r'AND'
 t_OR = r'OR'
 t_NOT = r'NOT'
+
+# Definir los tokens para operadores de comparación
+t_MAYOR_QUE = r'>'
+t_MENOR_QUE = r'<'
+t_MAYOR_IGUAL = r'>='
+t_MENOR_IGUAL = r'<='
+t_IGUAL_IGUAL = r'=='
+t_DIFERENTE = r'!='
 
 # 🔹 Ignorar espacios en blanco
 t_ignore = " \t\n"

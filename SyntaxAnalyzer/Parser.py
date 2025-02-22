@@ -9,6 +9,7 @@ precedence = (
     ("right", "NOT"),
     ("left", "ASIGNACION"),
     ("left", "PUNTO_COMA"),
+    ("nonassoc", "MAYOR_QUE", "MENOR_QUE", "MAYOR_IGUAL", "MENOR_IGUAL", "IGUAL_IGUAL", "DIFERENTE"),
 )
 
 variables = {}  
@@ -48,9 +49,9 @@ def p_empty(p):
 # Reglas para estructuras de control
 # Sentencia IF
 def p_sentencia_if(p):
-    """sentencia_if : SI expresion ENTONCES declaraciones FIN_SI
-    | SI expresion ENTONCES declaraciones SINO declaraciones FIN_SI"""
-    tipo_condicion, valor_condicion = p[2]
+    """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
+    | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
+    tipo_condicion, valor_condicion = p[3]
     if tipo_condicion != "BOOLEANO":
         print(
             f"⚠️ Error: La condición del 'si' debe ser booleana, pero se encontró {tipo_condicion}"
@@ -64,8 +65,8 @@ def p_sentencia_if(p):
 
 # Estructura de control WHILE
 def p_sentencia_mientras(p):
-    """sentencia_mientras : MIENTRAS expresion HACER declaraciones FIN_MIENTRAS"""
-    tipo_condicion, valor_condicion = p[2]
+    """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
+    tipo_condicion, valor_condicion = p[3]  # Asegúrate de que p[3] sea la expresión de la condición
     if tipo_condicion != "BOOLEANO":
         print(
             f"⚠️ Error: La condición del 'mientras' debe ser booleana, pero se encontró {tipo_condicion}"
@@ -74,39 +75,54 @@ def p_sentencia_mientras(p):
     print(f"📌 Sentencia MIENTRAS detectada: condición={valor_condicion}")
 
 
-# Estructura de control PARA
+# Estructura de control FOR
 def p_sentencia_para(p):
-    """sentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    | PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    """
-    # Aquí, la condición es implícita en "HASTA expresion"
-    tipo_condicion, valor_condicion = p[6]  # La expresión después de HASTA
-    if tipo_condicion != "BOOLEANO":
-        print(
-            f"⚠️ Error: La condición del 'para' debe ser booleana, pero se encontró {tipo_condicion}"
-        )
+    """sentencia_para : PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+                     | PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA"""
+    tipo_variable = p[2]  # Tipo de la variable de iteración (entero)
+    nombre_variable = p[3]  # Nombre de la variable de iteración (i)
+    desde_tipo, desde_valor = p[5]  # Expresión DESDE
+    hasta_tipo, hasta_valor = p[7]  # Expresión HASTA
+
+    # Verificar que el tipo de la variable de iteración sea ENTERO
+    if tipo_variable != "entero":
+        print(f"⚠️ Error: La variable de iteración '{nombre_variable}' debe ser de tipo ENTERO")
         return
-    if len(p) == 10:  # FOR sin paso
+
+    # Declarar la variable de iteración como ENTERO
+    variables[nombre_variable] = ("ENTERO", desde_valor)
+
+    # Verificar que las expresiones DESDE y HASTA sean ENTERO
+    if desde_tipo != "ENTERO" or hasta_tipo != "ENTERO":
+        print(f"⚠️ Error: Las expresiones DESDE y HASTA deben ser de tipo ENTERO")
+        return
+
+    # Manejar el caso con paso
+    if len(p) == 13:  # PARA con paso
+        paso_tipo, paso_valor = p[9]  # Expresión CON_PASO
+        if paso_tipo != "ENTERO":
+            print(f"⚠️ Error: El paso debe ser de tipo ENTERO")
+            return
         print(
-            f"📌 Sentencia PARA detectada: variable={p[2]}, desde={p[4]}, hasta={p[6]}"
+            f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}, paso={paso_valor}"
         )
-    else:  # FOR con paso
+    else:  # PARA sin paso
         print(
-            f"📌 Sentencia PARA detectada: variable={p[2]}, desde={p[4]}, hasta={p[6]}, paso={p[8]}"
+            f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}"
         )
 
 
 # Estructura de control DO-WHILE
 def p_sentencia_repetir(p):
-    """sentencia_repetir : REPETIR declaraciones HASTA_QUE expresion"""
-    tipo_condicion, valor_condicion = p[4]
+    """sentencia_repetir : REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
+    tipo_condicion, valor_condicion = p[5]  # La condición está en p[5]
     if tipo_condicion != "BOOLEANO":
         print(
             f"⚠️ Error: La condición del 'repetir' debe ser booleana, pero se encontró {tipo_condicion}"
         )
         return
     print(f"📌 Sentencia REPETIR detectada: condición={valor_condicion}")
-
+    
 # ------------------------ Regla para MOSTRAR ------------------------
 
 def p_sentencia_mostrar(p):
@@ -131,21 +147,27 @@ def p_expresion(p):
     | expresion DIVISION expresion
     | expresion AND expresion
     | expresion OR expresion
-    | NOT expresion"""
+    | NOT expresion
+    | expresion MAYOR_QUE expresion
+    | expresion MENOR_QUE expresion
+    | expresion MAYOR_IGUAL expresion
+    | expresion MENOR_IGUAL expresion
+    | expresion IGUAL_IGUAL expresion
+    | expresion DIFERENTE expresion"""
 
     if len(p) == 2:  # Caso base (literales o identificadores)
         if isinstance(p[1], tuple):  # Extraer tipo y valor
             tipo_valor, valor = p[1]
             p[0] = (tipo_valor, valor)
         elif isinstance(p[1], str) and p[1] in variables:
-            p[0] = variables[p[1]]  #  Obtener tipo y valor de la variable
+            p[0] = variables[p[1]]  # Obtener tipo y valor de la variable
         elif isinstance(p[1], str) and p[1] in constantes:
-            p[0] = (constantes[p[1]][0], p[1])  #  Obtener tipo de constante
+            p[0] = (constantes[p[1]][0], p[1])  # Obtener tipo de constante
         else:
             print(f"⚠️ Error: Variable '{p[1]}' no definida")
             p[0] = ("ERROR", p[1])
         
-    else:  # Expresiones aritméticas o lógicas
+    else:  # Expresiones aritméticas, lógicas o de comparación
         if p[2] == '+':
             p[0] = ("ENTERO", p[1][1] + p[3][1])
         elif p[2] == '-':
@@ -160,6 +182,18 @@ def p_expresion(p):
             p[0] = ("BOOLEANO", p[1][1] or p[3][1])
         elif p[1] == 'NOT':
             p[0] = ("BOOLEANO", not p[2][1])
+        elif p[2] == '>':
+            p[0] = ("BOOLEANO", p[1][1] > p[3][1])
+        elif p[2] == '<':
+            p[0] = ("BOOLEANO", p[1][1] < p[3][1])
+        elif p[2] == '>=':
+            p[0] = ("BOOLEANO", p[1][1] >= p[3][1])
+        elif p[2] == '<=':
+            p[0] = ("BOOLEANO", p[1][1] <= p[3][1])
+        elif p[2] == '==':
+            p[0] = ("BOOLEANO", p[1][1] == p[3][1])
+        elif p[2] == '!=':
+            p[0] = ("BOOLEANO", p[1][1] != p[3][1])
             
 # ------------------------ Reglas para Declaración de Variables ------------------------
 
@@ -233,7 +267,7 @@ def p_asignacion(p):
 
 def p_constante(p):
     """constante : TIPO IDENTIFICADOR ASIGNACION expresion"""
-    tipo_variable = p[1][1].upper()
+    tipo_variable = p[1][1].upper()  # Asegúrate de que p[1] sea el tipo correcto
     nombre_variable = p[2]
     tipo_valor, valor = p[4]
     if nombre_variable in constantes:
