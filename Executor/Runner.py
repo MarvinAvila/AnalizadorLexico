@@ -6,7 +6,5 @@ def run_code(python_code):
         exec(python_code, {"__builtins__": __builtins__})  # Evita acceso a funciones peligrosas
     except Exception as e:
         error_message = "".join(traceback.format_exception_only(type(e), e)).strip()
-        print(f"Error de ejecución: {error_message}")
         return f"Error de ejecución: {error_message}"
-
     return "Ejecución completada sin errores"

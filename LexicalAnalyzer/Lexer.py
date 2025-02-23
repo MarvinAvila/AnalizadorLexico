@@ -51,9 +51,9 @@ tokens = [
 ] + list(reserved.values())
 
 
-# 🔹 Tipos de Datos (entero, decimal, cadena, booleano)
+# 🔹 Tipos de Datos (entero, decimal, cadena, booleano, constante)
 def t_TIPO(t):
-    r"\b(entero|decimal|cadena|booleano)\b"
+    r"\b(entero|decimal|cadena|booleano|constante)\b"  # Solo estos tipos de datos
     print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 

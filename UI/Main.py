@@ -7,7 +7,9 @@ from tkinter import ttk, scrolledtext
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from LexicalAnalyzer.Lexer import lexer  
-from SyntaxAnalyzer.Parser import parser 
+from SyntaxAnalyzer.Parser import parser, SemanticError  # Agrega SemanticError aquí
+from LexicalAnalyzer.Lexer import reserved 
+from Executor.Runner import run_code  # Agrega esta línea para importar run_code
 
 class CompilerApp:
     def __init__(self):
@@ -65,7 +67,8 @@ class CompilerApp:
 
     def highlight_syntax(self, event=None):
         """Resalta las palabras clave, cadenas y comentarios en el área de texto."""
-        keywords = ["inicio", "fin", "si", "entonces", "sino", "mientras", "hacer", "para", "mostrar"]
+        # Obtener las palabras clave del diccionario reserved
+        keywords = list(reserved.keys())  # Usar las claves del diccionario reserved
         strings = r'"[^"]*"'  # Expresión regular para cadenas
         comments = r'//.*'    # Expresión regular para comentarios
 
@@ -77,7 +80,7 @@ class CompilerApp:
         for word in keywords:
             start = "1.0"
             while True:
-                start = self.text_area.search(word, start, stopindex=tk.END)
+                start = self.text_area.search(r'\m' + word + r'\M', start, stopindex=tk.END, regexp=True)
                 if not start:
                     break
                 end = f"{start}+{len(word)}c"
@@ -128,16 +131,33 @@ class CompilerApp:
             tokens.append((tok.type, tok.value))
 
         syntax_errors = []
+        semantic_errors = []
+        execution_errors = []
+
         try:
             # Enviar el código al parser para análisis sintáctico
             print("📌 Enviando código al parser...")
-            print(f"📄 Código enviado al parser:\n{code}\n")  # 🔥 Imprimir el código que llega al parser
             parser.parse(code)  # 🔥 Aquí se envía el código al parser
             print("✔️ Análisis sintáctico completado.")
-        except Exception as e:
+        except SyntaxError as e:
             # Capturar errores de sintaxis
             syntax_errors.append(str(e))
             print(f"❌ Error en el parser: {e}")
+        except SemanticError as e:
+            # Capturar errores semánticos
+            semantic_errors.append(str(e))
+            print(f"❌ Error semántico: {e}")
+
+        # Ejecutar el código si no hay errores sintácticos o semánticos
+        if not syntax_errors and not semantic_errors:
+            try:
+                # Aquí deberías generar el código Python a partir del código fuente
+                python_code = self.generate_python_code(code)  # Implementa esta función
+                execution_result = run_code(python_code)
+                if "Error de ejecución" in execution_result:
+                    execution_errors.append(execution_result)
+            except Exception as e:
+                execution_errors.append(f"Error de ejecución: {str(e)}")
 
         # Mostrar tokens y errores en la interfaz
         self.token_list.delete(*self.token_list.get_children())
@@ -145,7 +165,7 @@ class CompilerApp:
             self.token_list.insert("", tk.END, values=token)
 
         self.error_list.delete(*self.error_list.get_children())
-        for error in lex_errors + syntax_errors:
+        for error in lex_errors + syntax_errors + semantic_errors + execution_errors:
             self.error_list.insert("", tk.END, values=(f"  {error}  ",))
 
         print("🚀 Análisis finalizado.\n")

@@ -18,8 +18,8 @@ Rule 12    empty -> <empty>
 Rule 13    sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
 Rule 14    sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
 Rule 15    sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-Rule 16    sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-Rule 17    sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+Rule 16    sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+Rule 17    sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
 Rule 18    sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
 Rule 19    sentencia_mostrar -> MOSTRAR lista_expresiones PUNTO_COMA
 Rule 20    expresion -> LITERAL_ENTERO
@@ -40,18 +40,19 @@ Rule 34    expresion -> expresion MAYOR_IGUAL expresion
 Rule 35    expresion -> expresion MENOR_IGUAL expresion
 Rule 36    expresion -> expresion IGUAL_IGUAL expresion
 Rule 37    expresion -> expresion DIFERENTE expresion
-Rule 38    lista_expresiones -> lista_expresiones COMA expresion
-Rule 39    lista_expresiones -> expresion
-Rule 40    declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA
-Rule 41    declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-Rule 42    asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-Rule 43    constante -> TIPO IDENTIFICADOR ASIGNACION expresion
+Rule 38    expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER
+Rule 39    lista_expresiones -> lista_expresiones COMA expresion
+Rule 40    lista_expresiones -> expresion
+Rule 41    declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA
+Rule 42    declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+Rule 43    asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+Rule 44    constante -> TIPO IDENTIFICADOR ASIGNACION expresion
 
 Terminals, with rules where they appear
 
 AND                  : 29
-ASIGNACION           : 41 42 43
-COMA                 : 38
+ASIGNACION           : 42 43 44
+COMA                 : 39
 CON_PASO             : 17
 DESDE                : 16 17
 DIFERENTE            : 37
@@ -64,7 +65,7 @@ FIN_SI               : 13 14
 HACER                : 15 16 17
 HASTA                : 16 17
 HASTA_QUE            : 18
-IDENTIFICADOR        : 16 17 24 40 41 42 43
+IDENTIFICADOR        : 16 17 24 41 42 43 44
 IGUAL_IGUAL          : 36
 INICIO               : 1
 LITERAL_BOOLEANO     : 23
@@ -81,15 +82,15 @@ MULTIPLICACION       : 27
 NOT                  : 31
 OR                   : 30
 PARA                 : 16 17
-PARENTESIS_DER       : 13 14 15 18
-PARENTESIS_IZQ       : 13 14 15 18
-PUNTO_COMA           : 18 19 40 41 42
+PARENTESIS_DER       : 13 14 15 18 38
+PARENTESIS_IZQ       : 13 14 15 18 38
+PUNTO_COMA           : 18 19 41 42 43
 REPETIR              : 18
 RESTA                : 26
 SI                   : 13 14
 SINO                 : 14
 SUMA                 : 25
-TIPO                 : 16 17 40 41 43
+TIPO                 : 41 42 44
 error                : 
 
 Nonterminals, with rules where they appear
@@ -100,8 +101,8 @@ declaracion_con_asignacion : 3
 declaracion_simple   : 2
 declaraciones        : 1 2 3 4 5 6 7 8 9 10 13 14 14 15 16 17 18
 empty                : 11
-expresion            : 13 14 15 16 16 17 17 17 18 25 25 26 26 27 27 28 28 29 29 30 30 31 32 32 33 33 34 34 35 35 36 36 37 37 38 39 41 42 43
-lista_expresiones    : 19 38
+expresion            : 13 14 15 16 16 17 17 17 18 25 25 26 26 27 27 28 28 29 29 30 30 31 32 32 33 33 34 34 35 35 36 36 37 37 38 39 40 42 43 44
+lista_expresiones    : 19 39
 programa             : 0
 sentencia_if         : 6
 sentencia_mientras   : 7
@@ -165,15 +166,15 @@ state 3
     (8) declaraciones -> declaraciones . sentencia_para
     (9) declaraciones -> declaraciones . sentencia_repetir
     (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
     (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
     (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
     (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
 
@@ -395,16 +396,16 @@ state 14
 
 state 15
 
-    (40) declaracion_simple -> TIPO . IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> TIPO . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> TIPO . IDENTIFICADOR ASIGNACION expresion
+    (41) declaracion_simple -> TIPO . IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> TIPO . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> TIPO . IDENTIFICADOR ASIGNACION expresion
 
     IDENTIFICADOR   shift and go to state 22
 
 
 state 16
 
-    (42) asignacion -> IDENTIFICADOR . ASIGNACION expresion PUNTO_COMA
+    (43) asignacion -> IDENTIFICADOR . ASIGNACION expresion PUNTO_COMA
 
     ASIGNACION      shift and go to state 23
 
@@ -426,10 +427,10 @@ state 18
 
 state 19
 
-    (16) sentencia_para -> PARA . TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA . TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> PARA . IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA . IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
 
-    TIPO            shift and go to state 26
+    IDENTIFICADOR   shift and go to state 26
 
 
 state 20
@@ -462,8 +463,8 @@ state 20
 state 21
 
     (19) sentencia_mostrar -> MOSTRAR . lista_expresiones PUNTO_COMA
-    (38) lista_expresiones -> . lista_expresiones COMA expresion
-    (39) lista_expresiones -> . expresion
+    (39) lista_expresiones -> . lista_expresiones COMA expresion
+    (40) lista_expresiones -> . expresion
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -482,6 +483,7 @@ state 21
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -489,23 +491,24 @@ state 21
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
     lista_expresiones              shift and go to state 28
     expresion                      shift and go to state 29
 
 state 22
 
-    (40) declaracion_simple -> TIPO IDENTIFICADOR . PUNTO_COMA
-    (41) declaracion_con_asignacion -> TIPO IDENTIFICADOR . ASIGNACION expresion PUNTO_COMA
-    (43) constante -> TIPO IDENTIFICADOR . ASIGNACION expresion
+    (41) declaracion_simple -> TIPO IDENTIFICADOR . PUNTO_COMA
+    (42) declaracion_con_asignacion -> TIPO IDENTIFICADOR . ASIGNACION expresion PUNTO_COMA
+    (44) constante -> TIPO IDENTIFICADOR . ASIGNACION expresion
 
-    PUNTO_COMA      shift and go to state 36
-    ASIGNACION      shift and go to state 37
+    PUNTO_COMA      shift and go to state 37
+    ASIGNACION      shift and go to state 38
 
 
 state 23
 
-    (42) asignacion -> IDENTIFICADOR ASIGNACION . expresion PUNTO_COMA
+    (43) asignacion -> IDENTIFICADOR ASIGNACION . expresion PUNTO_COMA
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -524,6 +527,7 @@ state 23
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -531,8 +535,9 @@ state 23
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 38
+    expresion                      shift and go to state 39
 
 state 24
 
@@ -556,6 +561,7 @@ state 24
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -563,8 +569,9 @@ state 24
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 39
+    expresion                      shift and go to state 40
 
 state 25
 
@@ -587,6 +594,7 @@ state 25
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -594,15 +602,16 @@ state 25
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 40
+    expresion                      shift and go to state 41
 
 state 26
 
-    (16) sentencia_para -> PARA TIPO . IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO . IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> PARA IDENTIFICADOR . DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR . DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
 
-    IDENTIFICADOR   shift and go to state 41
+    DESDE           shift and go to state 42
 
 
 state 27
@@ -617,19 +626,19 @@ state 27
     (8) declaraciones -> declaraciones . sentencia_para
     (9) declaraciones -> declaraciones . sentencia_repetir
     (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
     (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
     (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
     (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
 
-    HASTA_QUE       shift and go to state 42
+    HASTA_QUE       shift and go to state 43
     TIPO            shift and go to state 15
     IDENTIFICADOR   shift and go to state 16
     SI              shift and go to state 17
@@ -651,15 +660,15 @@ state 27
 state 28
 
     (19) sentencia_mostrar -> MOSTRAR lista_expresiones . PUNTO_COMA
-    (38) lista_expresiones -> lista_expresiones . COMA expresion
+    (39) lista_expresiones -> lista_expresiones . COMA expresion
 
-    PUNTO_COMA      shift and go to state 43
-    COMA            shift and go to state 44
+    PUNTO_COMA      shift and go to state 44
+    COMA            shift and go to state 45
 
 
 state 29
 
-    (39) lista_expresiones -> expresion .
+    (40) lista_expresiones -> expresion .
     (25) expresion -> expresion . SUMA expresion
     (26) expresion -> expresion . RESTA expresion
     (27) expresion -> expresion . MULTIPLICACION expresion
@@ -673,20 +682,20 @@ state 29
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PUNTO_COMA      reduce using rule 39 (lista_expresiones -> expresion .)
-    COMA            reduce using rule 39 (lista_expresiones -> expresion .)
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    PUNTO_COMA      reduce using rule 40 (lista_expresiones -> expresion .)
+    COMA            reduce using rule 40 (lista_expresiones -> expresion .)
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
 state 30
@@ -895,6 +904,7 @@ state 35
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -902,32 +912,13 @@ state 35
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 57
+    expresion                      shift and go to state 58
 
 state 36
 
-    (40) declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .
-
-    FIN             reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    TIPO            reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    SI              reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    MIENTRAS        reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    PARA            reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    REPETIR         reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    MOSTRAR         reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    HASTA_QUE       reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    FIN_SI          reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    SINO            reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    FIN_MIENTRAS    reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-    FIN_PARA        reduce using rule 40 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
-
-
-state 37
-
-    (41) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION . expresion PUNTO_COMA
-    (43) constante -> TIPO IDENTIFICADOR ASIGNACION . expresion
+    (38) expresion -> PARENTESIS_IZQ . expresion PARENTESIS_DER
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -946,6 +937,7 @@ state 37
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -953,12 +945,66 @@ state 37
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 58
+    expresion                      shift and go to state 59
+
+state 37
+
+    (41) declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .
+
+    FIN             reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    TIPO            reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    SI              reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    MIENTRAS        reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    PARA            reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    REPETIR         reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    MOSTRAR         reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    HASTA_QUE       reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    FIN_SI          reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    SINO            reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    FIN_MIENTRAS    reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+    FIN_PARA        reduce using rule 41 (declaracion_simple -> TIPO IDENTIFICADOR PUNTO_COMA .)
+
 
 state 38
 
-    (42) asignacion -> IDENTIFICADOR ASIGNACION expresion . PUNTO_COMA
+    (42) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION . expresion PUNTO_COMA
+    (44) constante -> TIPO IDENTIFICADOR ASIGNACION . expresion
+    (20) expresion -> . LITERAL_ENTERO
+    (21) expresion -> . LITERAL_DECIMAL
+    (22) expresion -> . LITERAL_CADENA
+    (23) expresion -> . LITERAL_BOOLEANO
+    (24) expresion -> . IDENTIFICADOR
+    (25) expresion -> . expresion SUMA expresion
+    (26) expresion -> . expresion RESTA expresion
+    (27) expresion -> . expresion MULTIPLICACION expresion
+    (28) expresion -> . expresion DIVISION expresion
+    (29) expresion -> . expresion AND expresion
+    (30) expresion -> . expresion OR expresion
+    (31) expresion -> . NOT expresion
+    (32) expresion -> . expresion MAYOR_QUE expresion
+    (33) expresion -> . expresion MENOR_QUE expresion
+    (34) expresion -> . expresion MAYOR_IGUAL expresion
+    (35) expresion -> . expresion MENOR_IGUAL expresion
+    (36) expresion -> . expresion IGUAL_IGUAL expresion
+    (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
+
+    LITERAL_ENTERO  shift and go to state 30
+    LITERAL_DECIMAL shift and go to state 31
+    LITERAL_CADENA  shift and go to state 32
+    LITERAL_BOOLEANO shift and go to state 33
+    IDENTIFICADOR   shift and go to state 34
+    NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
+
+    expresion                      shift and go to state 60
+
+state 39
+
+    (43) asignacion -> IDENTIFICADOR ASIGNACION expresion . PUNTO_COMA
     (25) expresion -> expresion . SUMA expresion
     (26) expresion -> expresion . RESTA expresion
     (27) expresion -> expresion . MULTIPLICACION expresion
@@ -972,22 +1018,22 @@ state 38
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PUNTO_COMA      shift and go to state 59
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    PUNTO_COMA      shift and go to state 61
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
-state 39
+state 40
 
     (13) sentencia_if -> SI PARENTESIS_IZQ expresion . PARENTESIS_DER ENTONCES declaraciones FIN_SI
     (14) sentencia_if -> SI PARENTESIS_IZQ expresion . PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
@@ -1004,22 +1050,22 @@ state 39
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PARENTESIS_DER  shift and go to state 60
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    PARENTESIS_DER  shift and go to state 62
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
-state 40
+state 41
 
     (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion . PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
     (25) expresion -> expresion . SUMA expresion
@@ -1035,37 +1081,63 @@ state 40
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PARENTESIS_DER  shift and go to state 61
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 41
-
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR . DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR . DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-
-    DESDE           shift and go to state 62
+    PARENTESIS_DER  shift and go to state 63
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
 state 42
 
-    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE . PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE . expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE . expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (20) expresion -> . LITERAL_ENTERO
+    (21) expresion -> . LITERAL_DECIMAL
+    (22) expresion -> . LITERAL_CADENA
+    (23) expresion -> . LITERAL_BOOLEANO
+    (24) expresion -> . IDENTIFICADOR
+    (25) expresion -> . expresion SUMA expresion
+    (26) expresion -> . expresion RESTA expresion
+    (27) expresion -> . expresion MULTIPLICACION expresion
+    (28) expresion -> . expresion DIVISION expresion
+    (29) expresion -> . expresion AND expresion
+    (30) expresion -> . expresion OR expresion
+    (31) expresion -> . NOT expresion
+    (32) expresion -> . expresion MAYOR_QUE expresion
+    (33) expresion -> . expresion MENOR_QUE expresion
+    (34) expresion -> . expresion MAYOR_IGUAL expresion
+    (35) expresion -> . expresion MENOR_IGUAL expresion
+    (36) expresion -> . expresion IGUAL_IGUAL expresion
+    (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
-    PARENTESIS_IZQ  shift and go to state 63
+    LITERAL_ENTERO  shift and go to state 30
+    LITERAL_DECIMAL shift and go to state 31
+    LITERAL_CADENA  shift and go to state 32
+    LITERAL_BOOLEANO shift and go to state 33
+    IDENTIFICADOR   shift and go to state 34
+    NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
+    expresion                      shift and go to state 64
 
 state 43
+
+    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE . PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+
+    PARENTESIS_IZQ  shift and go to state 65
+
+
+state 44
 
     (19) sentencia_mostrar -> MOSTRAR lista_expresiones PUNTO_COMA .
 
@@ -1084,9 +1156,9 @@ state 43
     FIN_PARA        reduce using rule 19 (sentencia_mostrar -> MOSTRAR lista_expresiones PUNTO_COMA .)
 
 
-state 44
+state 45
 
-    (38) lista_expresiones -> lista_expresiones COMA . expresion
+    (39) lista_expresiones -> lista_expresiones COMA . expresion
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -1105,6 +1177,7 @@ state 44
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1112,10 +1185,11 @@ state 44
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 64
+    expresion                      shift and go to state 66
 
-state 45
+state 46
 
     (25) expresion -> expresion SUMA . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1136,6 +1210,7 @@ state 45
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1143,10 +1218,11 @@ state 45
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 65
+    expresion                      shift and go to state 67
 
-state 46
+state 47
 
     (26) expresion -> expresion RESTA . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1167,6 +1243,7 @@ state 46
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1174,10 +1251,11 @@ state 46
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 66
+    expresion                      shift and go to state 68
 
-state 47
+state 48
 
     (27) expresion -> expresion MULTIPLICACION . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1198,6 +1276,7 @@ state 47
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1205,10 +1284,11 @@ state 47
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 67
+    expresion                      shift and go to state 69
 
-state 48
+state 49
 
     (28) expresion -> expresion DIVISION . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1229,6 +1309,7 @@ state 48
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1236,10 +1317,11 @@ state 48
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 68
+    expresion                      shift and go to state 70
 
-state 49
+state 50
 
     (29) expresion -> expresion AND . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1260,6 +1342,7 @@ state 49
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1267,10 +1350,11 @@ state 49
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 69
+    expresion                      shift and go to state 71
 
-state 50
+state 51
 
     (30) expresion -> expresion OR . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1291,6 +1375,7 @@ state 50
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1298,10 +1383,11 @@ state 50
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 70
+    expresion                      shift and go to state 72
 
-state 51
+state 52
 
     (32) expresion -> expresion MAYOR_QUE . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1322,6 +1408,7 @@ state 51
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1329,10 +1416,11 @@ state 51
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 71
+    expresion                      shift and go to state 73
 
-state 52
+state 53
 
     (33) expresion -> expresion MENOR_QUE . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1353,6 +1441,7 @@ state 52
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1360,10 +1449,11 @@ state 52
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 72
+    expresion                      shift and go to state 74
 
-state 53
+state 54
 
     (34) expresion -> expresion MAYOR_IGUAL . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1384,6 +1474,7 @@ state 53
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1391,10 +1482,11 @@ state 53
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 73
+    expresion                      shift and go to state 75
 
-state 54
+state 55
 
     (35) expresion -> expresion MENOR_IGUAL . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1415,6 +1507,7 @@ state 54
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1422,10 +1515,11 @@ state 54
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 74
+    expresion                      shift and go to state 76
 
-state 55
+state 56
 
     (36) expresion -> expresion IGUAL_IGUAL . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1446,6 +1540,7 @@ state 55
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1453,10 +1548,11 @@ state 55
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 75
+    expresion                      shift and go to state 77
 
-state 56
+state 57
 
     (37) expresion -> expresion DIFERENTE . expresion
     (20) expresion -> . LITERAL_ENTERO
@@ -1477,6 +1573,7 @@ state 56
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1484,10 +1581,11 @@ state 56
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 76
+    expresion                      shift and go to state 78
 
-state 57
+state 58
 
     (31) expresion -> NOT expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -1528,12 +1626,12 @@ state 57
     HASTA           reduce using rule 31 (expresion -> NOT expresion .)
     HACER           reduce using rule 31 (expresion -> NOT expresion .)
     CON_PASO        reduce using rule 31 (expresion -> NOT expresion .)
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! MAYOR_QUE       [ reduce using rule 31 (expresion -> NOT expresion .) ]
   ! MENOR_QUE       [ reduce using rule 31 (expresion -> NOT expresion .) ]
@@ -1541,18 +1639,17 @@ state 57
   ! MENOR_IGUAL     [ reduce using rule 31 (expresion -> NOT expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 31 (expresion -> NOT expresion .) ]
   ! DIFERENTE       [ reduce using rule 31 (expresion -> NOT expresion .) ]
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 58
+state 59
 
-    (41) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion . PUNTO_COMA
-    (43) constante -> TIPO IDENTIFICADOR ASIGNACION expresion .
+    (38) expresion -> PARENTESIS_IZQ expresion . PARENTESIS_DER
     (25) expresion -> expresion . SUMA expresion
     (26) expresion -> expresion . RESTA expresion
     (27) expresion -> expresion . MULTIPLICACION expresion
@@ -1566,101 +1663,133 @@ state 58
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PUNTO_COMA      shift and go to state 77
-    FIN             reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    TIPO            reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    IDENTIFICADOR   reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    SI              reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    MIENTRAS        reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    PARA            reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    REPETIR         reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    MOSTRAR         reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    HASTA_QUE       reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    FIN_SI          reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    SINO            reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    FIN_MIENTRAS    reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    FIN_PARA        reduce using rule 43 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 59
-
-    (42) asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .
-
-    FIN             reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    TIPO            reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    SI              reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    MIENTRAS        reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    PARA            reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    REPETIR         reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    MOSTRAR         reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    HASTA_QUE       reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_SI          reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    SINO            reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_MIENTRAS    reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_PARA        reduce using rule 42 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    PARENTESIS_DER  shift and go to state 79
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
 state 60
 
-    (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER . ENTONCES declaraciones FIN_SI
-    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER . ENTONCES declaraciones SINO declaraciones FIN_SI
+    (42) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion . PUNTO_COMA
+    (44) constante -> TIPO IDENTIFICADOR ASIGNACION expresion .
+    (25) expresion -> expresion . SUMA expresion
+    (26) expresion -> expresion . RESTA expresion
+    (27) expresion -> expresion . MULTIPLICACION expresion
+    (28) expresion -> expresion . DIVISION expresion
+    (29) expresion -> expresion . AND expresion
+    (30) expresion -> expresion . OR expresion
+    (32) expresion -> expresion . MAYOR_QUE expresion
+    (33) expresion -> expresion . MENOR_QUE expresion
+    (34) expresion -> expresion . MAYOR_IGUAL expresion
+    (35) expresion -> expresion . MENOR_IGUAL expresion
+    (36) expresion -> expresion . IGUAL_IGUAL expresion
+    (37) expresion -> expresion . DIFERENTE expresion
 
-    ENTONCES        shift and go to state 78
+    PUNTO_COMA      shift and go to state 80
+    FIN             reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    TIPO            reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    IDENTIFICADOR   reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    SI              reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    MIENTRAS        reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    PARA            reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    REPETIR         reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    MOSTRAR         reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    HASTA_QUE       reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    FIN_SI          reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    SINO            reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    FIN_MIENTRAS    reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    FIN_PARA        reduce using rule 44 (constante -> TIPO IDENTIFICADOR ASIGNACION expresion .)
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
 state 61
 
-    (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER . HACER declaraciones FIN_MIENTRAS
+    (43) asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .
 
-    HACER           shift and go to state 79
+    FIN             reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    TIPO            reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    SI              reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    MIENTRAS        reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    PARA            reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    REPETIR         reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    MOSTRAR         reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    HASTA_QUE       reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_SI          reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    SINO            reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_MIENTRAS    reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_PARA        reduce using rule 43 (asignacion -> IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
 
 
 state 62
 
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE . expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE . expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    (20) expresion -> . LITERAL_ENTERO
-    (21) expresion -> . LITERAL_DECIMAL
-    (22) expresion -> . LITERAL_CADENA
-    (23) expresion -> . LITERAL_BOOLEANO
-    (24) expresion -> . IDENTIFICADOR
-    (25) expresion -> . expresion SUMA expresion
-    (26) expresion -> . expresion RESTA expresion
-    (27) expresion -> . expresion MULTIPLICACION expresion
-    (28) expresion -> . expresion DIVISION expresion
-    (29) expresion -> . expresion AND expresion
-    (30) expresion -> . expresion OR expresion
-    (31) expresion -> . NOT expresion
-    (32) expresion -> . expresion MAYOR_QUE expresion
-    (33) expresion -> . expresion MENOR_QUE expresion
-    (34) expresion -> . expresion MAYOR_IGUAL expresion
-    (35) expresion -> . expresion MENOR_IGUAL expresion
-    (36) expresion -> . expresion IGUAL_IGUAL expresion
-    (37) expresion -> . expresion DIFERENTE expresion
+    (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER . ENTONCES declaraciones FIN_SI
+    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER . ENTONCES declaraciones SINO declaraciones FIN_SI
 
-    LITERAL_ENTERO  shift and go to state 30
-    LITERAL_DECIMAL shift and go to state 31
-    LITERAL_CADENA  shift and go to state 32
-    LITERAL_BOOLEANO shift and go to state 33
-    IDENTIFICADOR   shift and go to state 34
-    NOT             shift and go to state 35
+    ENTONCES        shift and go to state 81
 
-    expresion                      shift and go to state 80
 
 state 63
+
+    (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER . HACER declaraciones FIN_MIENTRAS
+
+    HACER           shift and go to state 82
+
+
+state 64
+
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion . HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion . HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (25) expresion -> expresion . SUMA expresion
+    (26) expresion -> expresion . RESTA expresion
+    (27) expresion -> expresion . MULTIPLICACION expresion
+    (28) expresion -> expresion . DIVISION expresion
+    (29) expresion -> expresion . AND expresion
+    (30) expresion -> expresion . OR expresion
+    (32) expresion -> expresion . MAYOR_QUE expresion
+    (33) expresion -> expresion . MENOR_QUE expresion
+    (34) expresion -> expresion . MAYOR_IGUAL expresion
+    (35) expresion -> expresion . MENOR_IGUAL expresion
+    (36) expresion -> expresion . IGUAL_IGUAL expresion
+    (37) expresion -> expresion . DIFERENTE expresion
+
+    HASTA           shift and go to state 83
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
+
+
+state 65
 
     (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ . expresion PARENTESIS_DER PUNTO_COMA
     (20) expresion -> . LITERAL_ENTERO
@@ -1681,6 +1810,7 @@ state 63
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -1688,12 +1818,13 @@ state 63
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 81
+    expresion                      shift and go to state 84
 
-state 64
+state 66
 
-    (38) lista_expresiones -> lista_expresiones COMA expresion .
+    (39) lista_expresiones -> lista_expresiones COMA expresion .
     (25) expresion -> expresion . SUMA expresion
     (26) expresion -> expresion . RESTA expresion
     (27) expresion -> expresion . MULTIPLICACION expresion
@@ -1707,23 +1838,23 @@ state 64
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    PUNTO_COMA      reduce using rule 38 (lista_expresiones -> lista_expresiones COMA expresion .)
-    COMA            reduce using rule 38 (lista_expresiones -> lista_expresiones COMA expresion .)
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    PUNTO_COMA      reduce using rule 39 (lista_expresiones -> lista_expresiones COMA expresion .)
+    COMA            reduce using rule 39 (lista_expresiones -> lista_expresiones COMA expresion .)
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
-state 65
+state 67
 
     (25) expresion -> expresion SUMA expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -1762,14 +1893,14 @@ state 65
     HASTA           reduce using rule 25 (expresion -> expresion SUMA expresion .)
     HACER           reduce using rule 25 (expresion -> expresion SUMA expresion .)
     CON_PASO        reduce using rule 25 (expresion -> expresion SUMA expresion .)
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! MULTIPLICACION  [ reduce using rule 25 (expresion -> expresion SUMA expresion .) ]
   ! DIVISION        [ reduce using rule 25 (expresion -> expresion SUMA expresion .) ]
@@ -1779,13 +1910,13 @@ state 65
   ! MENOR_IGUAL     [ reduce using rule 25 (expresion -> expresion SUMA expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 25 (expresion -> expresion SUMA expresion .) ]
   ! DIFERENTE       [ reduce using rule 25 (expresion -> expresion SUMA expresion .) ]
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 66
+state 68
 
     (26) expresion -> expresion RESTA expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -1824,14 +1955,14 @@ state 66
     HASTA           reduce using rule 26 (expresion -> expresion RESTA expresion .)
     HACER           reduce using rule 26 (expresion -> expresion RESTA expresion .)
     CON_PASO        reduce using rule 26 (expresion -> expresion RESTA expresion .)
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! MULTIPLICACION  [ reduce using rule 26 (expresion -> expresion RESTA expresion .) ]
   ! DIVISION        [ reduce using rule 26 (expresion -> expresion RESTA expresion .) ]
@@ -1841,13 +1972,13 @@ state 66
   ! MENOR_IGUAL     [ reduce using rule 26 (expresion -> expresion RESTA expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 26 (expresion -> expresion RESTA expresion .) ]
   ! DIFERENTE       [ reduce using rule 26 (expresion -> expresion RESTA expresion .) ]
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 67
+state 69
 
     (27) expresion -> expresion MULTIPLICACION expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -1888,12 +2019,12 @@ state 67
     HASTA           reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .)
     HACER           reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .)
     CON_PASO        reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .)
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! MAYOR_QUE       [ reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .) ]
   ! MENOR_QUE       [ reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .) ]
@@ -1901,15 +2032,15 @@ state 67
   ! MENOR_IGUAL     [ reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .) ]
   ! DIFERENTE       [ reduce using rule 27 (expresion -> expresion MULTIPLICACION expresion .) ]
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 68
+state 70
 
     (28) expresion -> expresion DIVISION expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -1950,12 +2081,12 @@ state 68
     HASTA           reduce using rule 28 (expresion -> expresion DIVISION expresion .)
     HACER           reduce using rule 28 (expresion -> expresion DIVISION expresion .)
     CON_PASO        reduce using rule 28 (expresion -> expresion DIVISION expresion .)
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! MAYOR_QUE       [ reduce using rule 28 (expresion -> expresion DIVISION expresion .) ]
   ! MENOR_QUE       [ reduce using rule 28 (expresion -> expresion DIVISION expresion .) ]
@@ -1963,15 +2094,15 @@ state 68
   ! MENOR_IGUAL     [ reduce using rule 28 (expresion -> expresion DIVISION expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 28 (expresion -> expresion DIVISION expresion .) ]
   ! DIFERENTE       [ reduce using rule 28 (expresion -> expresion DIVISION expresion .) ]
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 69
+state 71
 
     (29) expresion -> expresion AND expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2008,16 +2139,16 @@ state 69
     HASTA           reduce using rule 29 (expresion -> expresion AND expresion .)
     HACER           reduce using rule 29 (expresion -> expresion AND expresion .)
     CON_PASO        reduce using rule 29 (expresion -> expresion AND expresion .)
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! SUMA            [ reduce using rule 29 (expresion -> expresion AND expresion .) ]
   ! RESTA           [ reduce using rule 29 (expresion -> expresion AND expresion .) ]
@@ -2029,11 +2160,11 @@ state 69
   ! MENOR_IGUAL     [ reduce using rule 29 (expresion -> expresion AND expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 29 (expresion -> expresion AND expresion .) ]
   ! DIFERENTE       [ reduce using rule 29 (expresion -> expresion AND expresion .) ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 70
+state 72
 
     (30) expresion -> expresion OR expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2070,16 +2201,16 @@ state 70
     HASTA           reduce using rule 30 (expresion -> expresion OR expresion .)
     HACER           reduce using rule 30 (expresion -> expresion OR expresion .)
     CON_PASO        reduce using rule 30 (expresion -> expresion OR expresion .)
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
   ! SUMA            [ reduce using rule 30 (expresion -> expresion OR expresion .) ]
   ! RESTA           [ reduce using rule 30 (expresion -> expresion OR expresion .) ]
@@ -2091,11 +2222,11 @@ state 70
   ! MENOR_IGUAL     [ reduce using rule 30 (expresion -> expresion OR expresion .) ]
   ! IGUAL_IGUAL     [ reduce using rule 30 (expresion -> expresion OR expresion .) ]
   ! DIFERENTE       [ reduce using rule 30 (expresion -> expresion OR expresion .) ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
 
 
-state 71
+state 73
 
     (32) expresion -> expresion MAYOR_QUE expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2143,21 +2274,21 @@ state 71
     HACER           reduce using rule 32 (expresion -> expresion MAYOR_QUE expresion .)
     CON_PASO        reduce using rule 32 (expresion -> expresion MAYOR_QUE expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 72
+state 74
 
     (33) expresion -> expresion MENOR_QUE expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2205,21 +2336,21 @@ state 72
     HACER           reduce using rule 33 (expresion -> expresion MENOR_QUE expresion .)
     CON_PASO        reduce using rule 33 (expresion -> expresion MENOR_QUE expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 73
+state 75
 
     (34) expresion -> expresion MAYOR_IGUAL expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2267,21 +2398,21 @@ state 73
     HACER           reduce using rule 34 (expresion -> expresion MAYOR_IGUAL expresion .)
     CON_PASO        reduce using rule 34 (expresion -> expresion MAYOR_IGUAL expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 74
+state 76
 
     (35) expresion -> expresion MENOR_IGUAL expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2329,21 +2460,21 @@ state 74
     HACER           reduce using rule 35 (expresion -> expresion MENOR_IGUAL expresion .)
     CON_PASO        reduce using rule 35 (expresion -> expresion MENOR_IGUAL expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 75
+state 77
 
     (36) expresion -> expresion IGUAL_IGUAL expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2391,21 +2522,21 @@ state 75
     HACER           reduce using rule 36 (expresion -> expresion IGUAL_IGUAL expresion .)
     CON_PASO        reduce using rule 36 (expresion -> expresion IGUAL_IGUAL expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 76
+state 78
 
     (37) expresion -> expresion DIFERENTE expresion .
     (25) expresion -> expresion . SUMA expresion
@@ -2453,40 +2584,77 @@ state 76
     HACER           reduce using rule 37 (expresion -> expresion DIFERENTE expresion .)
     CON_PASO        reduce using rule 37 (expresion -> expresion DIFERENTE expresion .)
 
-  ! SUMA            [ shift and go to state 45 ]
-  ! RESTA           [ shift and go to state 46 ]
-  ! MULTIPLICACION  [ shift and go to state 47 ]
-  ! DIVISION        [ shift and go to state 48 ]
-  ! AND             [ shift and go to state 49 ]
-  ! OR              [ shift and go to state 50 ]
-  ! MAYOR_QUE       [ shift and go to state 51 ]
-  ! MENOR_QUE       [ shift and go to state 52 ]
-  ! MAYOR_IGUAL     [ shift and go to state 53 ]
-  ! MENOR_IGUAL     [ shift and go to state 54 ]
-  ! IGUAL_IGUAL     [ shift and go to state 55 ]
-  ! DIFERENTE       [ shift and go to state 56 ]
+  ! SUMA            [ shift and go to state 46 ]
+  ! RESTA           [ shift and go to state 47 ]
+  ! MULTIPLICACION  [ shift and go to state 48 ]
+  ! DIVISION        [ shift and go to state 49 ]
+  ! AND             [ shift and go to state 50 ]
+  ! OR              [ shift and go to state 51 ]
+  ! MAYOR_QUE       [ shift and go to state 52 ]
+  ! MENOR_QUE       [ shift and go to state 53 ]
+  ! MAYOR_IGUAL     [ shift and go to state 54 ]
+  ! MENOR_IGUAL     [ shift and go to state 55 ]
+  ! IGUAL_IGUAL     [ shift and go to state 56 ]
+  ! DIFERENTE       [ shift and go to state 57 ]
 
 
-state 77
+state 79
 
-    (41) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .
+    (38) expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .
 
-    FIN             reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    TIPO            reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    SI              reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    MIENTRAS        reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    PARA            reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    REPETIR         reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    MOSTRAR         reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    HASTA_QUE       reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_SI          reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    SINO            reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_MIENTRAS    reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
-    FIN_PARA        reduce using rule 41 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    SUMA            reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    RESTA           reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MULTIPLICACION  reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    DIVISION        reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    AND             reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    OR              reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MAYOR_QUE       reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MENOR_QUE       reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MAYOR_IGUAL     reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MENOR_IGUAL     reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    IGUAL_IGUAL     reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    DIFERENTE       reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    PUNTO_COMA      reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    COMA            reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    PARENTESIS_DER  reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    FIN             reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    TIPO            reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    IDENTIFICADOR   reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    SI              reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MIENTRAS        reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    PARA            reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    REPETIR         reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    MOSTRAR         reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    HASTA_QUE       reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    FIN_SI          reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    SINO            reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    FIN_MIENTRAS    reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    FIN_PARA        reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    HASTA           reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    HACER           reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
+    CON_PASO        reduce using rule 38 (expresion -> PARENTESIS_IZQ expresion PARENTESIS_DER .)
 
 
-state 78
+state 80
+
+    (42) declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .
+
+    FIN             reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    TIPO            reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    SI              reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    MIENTRAS        reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    PARA            reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    REPETIR         reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    MOSTRAR         reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    HASTA_QUE       reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_SI          reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    SINO            reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_MIENTRAS    reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+    FIN_PARA        reduce using rule 42 (declaracion_con_asignacion -> TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA .)
+
+
+state 81
 
     (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES . declaraciones FIN_SI
     (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES . declaraciones SINO declaraciones FIN_SI
@@ -2512,10 +2680,10 @@ state 78
     REPETIR         reduce using rule 12 (empty -> .)
     MOSTRAR         reduce using rule 12 (empty -> .)
 
-    declaraciones                  shift and go to state 82
+    declaraciones                  shift and go to state 85
     empty                          shift and go to state 4
 
-state 79
+state 82
 
     (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER . declaraciones FIN_MIENTRAS
     (2) declaraciones -> . declaraciones declaracion_simple
@@ -2539,164 +2707,13 @@ state 79
     REPETIR         reduce using rule 12 (empty -> .)
     MOSTRAR         reduce using rule 12 (empty -> .)
 
-    declaraciones                  shift and go to state 83
+    declaraciones                  shift and go to state 86
     empty                          shift and go to state 4
-
-state 80
-
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion . HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion . HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    (25) expresion -> expresion . SUMA expresion
-    (26) expresion -> expresion . RESTA expresion
-    (27) expresion -> expresion . MULTIPLICACION expresion
-    (28) expresion -> expresion . DIVISION expresion
-    (29) expresion -> expresion . AND expresion
-    (30) expresion -> expresion . OR expresion
-    (32) expresion -> expresion . MAYOR_QUE expresion
-    (33) expresion -> expresion . MENOR_QUE expresion
-    (34) expresion -> expresion . MAYOR_IGUAL expresion
-    (35) expresion -> expresion . MENOR_IGUAL expresion
-    (36) expresion -> expresion . IGUAL_IGUAL expresion
-    (37) expresion -> expresion . DIFERENTE expresion
-
-    HASTA           shift and go to state 84
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 81
-
-    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion . PARENTESIS_DER PUNTO_COMA
-    (25) expresion -> expresion . SUMA expresion
-    (26) expresion -> expresion . RESTA expresion
-    (27) expresion -> expresion . MULTIPLICACION expresion
-    (28) expresion -> expresion . DIVISION expresion
-    (29) expresion -> expresion . AND expresion
-    (30) expresion -> expresion . OR expresion
-    (32) expresion -> expresion . MAYOR_QUE expresion
-    (33) expresion -> expresion . MENOR_QUE expresion
-    (34) expresion -> expresion . MAYOR_IGUAL expresion
-    (35) expresion -> expresion . MENOR_IGUAL expresion
-    (36) expresion -> expresion . IGUAL_IGUAL expresion
-    (37) expresion -> expresion . DIFERENTE expresion
-
-    PARENTESIS_DER  shift and go to state 85
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 82
-
-    (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones . FIN_SI
-    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones . SINO declaraciones FIN_SI
-    (2) declaraciones -> declaraciones . declaracion_simple
-    (3) declaraciones -> declaraciones . declaracion_con_asignacion
-    (4) declaraciones -> declaraciones . constante
-    (5) declaraciones -> declaraciones . asignacion
-    (6) declaraciones -> declaraciones . sentencia_if
-    (7) declaraciones -> declaraciones . sentencia_mientras
-    (8) declaraciones -> declaraciones . sentencia_para
-    (9) declaraciones -> declaraciones . sentencia_repetir
-    (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
-    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
-    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
-    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
-
-    FIN_SI          shift and go to state 86
-    SINO            shift and go to state 87
-    TIPO            shift and go to state 15
-    IDENTIFICADOR   shift and go to state 16
-    SI              shift and go to state 17
-    MIENTRAS        shift and go to state 18
-    PARA            shift and go to state 19
-    REPETIR         shift and go to state 20
-    MOSTRAR         shift and go to state 21
-
-    declaracion_simple             shift and go to state 6
-    declaracion_con_asignacion     shift and go to state 7
-    constante                      shift and go to state 8
-    asignacion                     shift and go to state 9
-    sentencia_if                   shift and go to state 10
-    sentencia_mientras             shift and go to state 11
-    sentencia_para                 shift and go to state 12
-    sentencia_repetir              shift and go to state 13
-    sentencia_mostrar              shift and go to state 14
 
 state 83
 
-    (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones . FIN_MIENTRAS
-    (2) declaraciones -> declaraciones . declaracion_simple
-    (3) declaraciones -> declaraciones . declaracion_con_asignacion
-    (4) declaraciones -> declaraciones . constante
-    (5) declaraciones -> declaraciones . asignacion
-    (6) declaraciones -> declaraciones . sentencia_if
-    (7) declaraciones -> declaraciones . sentencia_mientras
-    (8) declaraciones -> declaraciones . sentencia_para
-    (9) declaraciones -> declaraciones . sentencia_repetir
-    (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
-    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
-    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
-    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
-
-    FIN_MIENTRAS    shift and go to state 88
-    TIPO            shift and go to state 15
-    IDENTIFICADOR   shift and go to state 16
-    SI              shift and go to state 17
-    MIENTRAS        shift and go to state 18
-    PARA            shift and go to state 19
-    REPETIR         shift and go to state 20
-    MOSTRAR         shift and go to state 21
-
-    declaracion_simple             shift and go to state 6
-    declaracion_con_asignacion     shift and go to state 7
-    constante                      shift and go to state 8
-    asignacion                     shift and go to state 9
-    sentencia_if                   shift and go to state 10
-    sentencia_mientras             shift and go to state 11
-    sentencia_para                 shift and go to state 12
-    sentencia_repetir              shift and go to state 13
-    sentencia_mostrar              shift and go to state 14
-
-state 84
-
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA . expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA . expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA . expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA . expresion CON_PASO expresion HACER declaraciones FIN_PARA
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -2715,6 +2732,7 @@ state 84
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -2722,17 +2740,170 @@ state 84
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 89
+    expresion                      shift and go to state 87
+
+state 84
+
+    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion . PARENTESIS_DER PUNTO_COMA
+    (25) expresion -> expresion . SUMA expresion
+    (26) expresion -> expresion . RESTA expresion
+    (27) expresion -> expresion . MULTIPLICACION expresion
+    (28) expresion -> expresion . DIVISION expresion
+    (29) expresion -> expresion . AND expresion
+    (30) expresion -> expresion . OR expresion
+    (32) expresion -> expresion . MAYOR_QUE expresion
+    (33) expresion -> expresion . MENOR_QUE expresion
+    (34) expresion -> expresion . MAYOR_IGUAL expresion
+    (35) expresion -> expresion . MENOR_IGUAL expresion
+    (36) expresion -> expresion . IGUAL_IGUAL expresion
+    (37) expresion -> expresion . DIFERENTE expresion
+
+    PARENTESIS_DER  shift and go to state 88
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
+
 
 state 85
 
-    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER . PUNTO_COMA
+    (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones . FIN_SI
+    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones . SINO declaraciones FIN_SI
+    (2) declaraciones -> declaraciones . declaracion_simple
+    (3) declaraciones -> declaraciones . declaracion_con_asignacion
+    (4) declaraciones -> declaraciones . constante
+    (5) declaraciones -> declaraciones . asignacion
+    (6) declaraciones -> declaraciones . sentencia_if
+    (7) declaraciones -> declaraciones . sentencia_mientras
+    (8) declaraciones -> declaraciones . sentencia_para
+    (9) declaraciones -> declaraciones . sentencia_repetir
+    (10) declaraciones -> declaraciones . sentencia_mostrar
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
+    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
+    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
 
-    PUNTO_COMA      shift and go to state 90
+    FIN_SI          shift and go to state 89
+    SINO            shift and go to state 90
+    TIPO            shift and go to state 15
+    IDENTIFICADOR   shift and go to state 16
+    SI              shift and go to state 17
+    MIENTRAS        shift and go to state 18
+    PARA            shift and go to state 19
+    REPETIR         shift and go to state 20
+    MOSTRAR         shift and go to state 21
 
+    declaracion_simple             shift and go to state 6
+    declaracion_con_asignacion     shift and go to state 7
+    constante                      shift and go to state 8
+    asignacion                     shift and go to state 9
+    sentencia_if                   shift and go to state 10
+    sentencia_mientras             shift and go to state 11
+    sentencia_para                 shift and go to state 12
+    sentencia_repetir              shift and go to state 13
+    sentencia_mostrar              shift and go to state 14
 
 state 86
+
+    (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones . FIN_MIENTRAS
+    (2) declaraciones -> declaraciones . declaracion_simple
+    (3) declaraciones -> declaraciones . declaracion_con_asignacion
+    (4) declaraciones -> declaraciones . constante
+    (5) declaraciones -> declaraciones . asignacion
+    (6) declaraciones -> declaraciones . sentencia_if
+    (7) declaraciones -> declaraciones . sentencia_mientras
+    (8) declaraciones -> declaraciones . sentencia_para
+    (9) declaraciones -> declaraciones . sentencia_repetir
+    (10) declaraciones -> declaraciones . sentencia_mostrar
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
+    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
+    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
+
+    FIN_MIENTRAS    shift and go to state 91
+    TIPO            shift and go to state 15
+    IDENTIFICADOR   shift and go to state 16
+    SI              shift and go to state 17
+    MIENTRAS        shift and go to state 18
+    PARA            shift and go to state 19
+    REPETIR         shift and go to state 20
+    MOSTRAR         shift and go to state 21
+
+    declaracion_simple             shift and go to state 6
+    declaracion_con_asignacion     shift and go to state 7
+    constante                      shift and go to state 8
+    asignacion                     shift and go to state 9
+    sentencia_if                   shift and go to state 10
+    sentencia_mientras             shift and go to state 11
+    sentencia_para                 shift and go to state 12
+    sentencia_repetir              shift and go to state 13
+    sentencia_mostrar              shift and go to state 14
+
+state 87
+
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion . HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion . CON_PASO expresion HACER declaraciones FIN_PARA
+    (25) expresion -> expresion . SUMA expresion
+    (26) expresion -> expresion . RESTA expresion
+    (27) expresion -> expresion . MULTIPLICACION expresion
+    (28) expresion -> expresion . DIVISION expresion
+    (29) expresion -> expresion . AND expresion
+    (30) expresion -> expresion . OR expresion
+    (32) expresion -> expresion . MAYOR_QUE expresion
+    (33) expresion -> expresion . MENOR_QUE expresion
+    (34) expresion -> expresion . MAYOR_IGUAL expresion
+    (35) expresion -> expresion . MENOR_IGUAL expresion
+    (36) expresion -> expresion . IGUAL_IGUAL expresion
+    (37) expresion -> expresion . DIFERENTE expresion
+
+    HACER           shift and go to state 92
+    CON_PASO        shift and go to state 93
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
+
+
+state 88
+
+    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER . PUNTO_COMA
+
+    PUNTO_COMA      shift and go to state 94
+
+
+state 89
 
     (13) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI .
 
@@ -2751,7 +2922,7 @@ state 86
     FIN_PARA        reduce using rule 13 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI .)
 
 
-state 87
+state 90
 
     (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO . declaraciones FIN_SI
     (2) declaraciones -> . declaraciones declaracion_simple
@@ -2775,10 +2946,10 @@ state 87
     REPETIR         reduce using rule 12 (empty -> .)
     MOSTRAR         reduce using rule 12 (empty -> .)
 
-    declaraciones                  shift and go to state 91
+    declaraciones                  shift and go to state 95
     empty                          shift and go to state 4
 
-state 88
+state 91
 
     (15) sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS .
 
@@ -2797,104 +2968,9 @@ state 88
     FIN_PARA        reduce using rule 15 (sentencia_mientras -> MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS .)
 
 
-state 89
-
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion . HACER declaraciones FIN_PARA
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion . CON_PASO expresion HACER declaraciones FIN_PARA
-    (25) expresion -> expresion . SUMA expresion
-    (26) expresion -> expresion . RESTA expresion
-    (27) expresion -> expresion . MULTIPLICACION expresion
-    (28) expresion -> expresion . DIVISION expresion
-    (29) expresion -> expresion . AND expresion
-    (30) expresion -> expresion . OR expresion
-    (32) expresion -> expresion . MAYOR_QUE expresion
-    (33) expresion -> expresion . MENOR_QUE expresion
-    (34) expresion -> expresion . MAYOR_IGUAL expresion
-    (35) expresion -> expresion . MENOR_IGUAL expresion
-    (36) expresion -> expresion . IGUAL_IGUAL expresion
-    (37) expresion -> expresion . DIFERENTE expresion
-
-    HACER           shift and go to state 92
-    CON_PASO        shift and go to state 93
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 90
-
-    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .
-
-    FIN             reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    TIPO            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    IDENTIFICADOR   reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    SI              reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    MIENTRAS        reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    PARA            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    REPETIR         reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    MOSTRAR         reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    HASTA_QUE       reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    FIN_SI          reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    SINO            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    FIN_MIENTRAS    reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-    FIN_PARA        reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
-
-
-state 91
-
-    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones . FIN_SI
-    (2) declaraciones -> declaraciones . declaracion_simple
-    (3) declaraciones -> declaraciones . declaracion_con_asignacion
-    (4) declaraciones -> declaraciones . constante
-    (5) declaraciones -> declaraciones . asignacion
-    (6) declaraciones -> declaraciones . sentencia_if
-    (7) declaraciones -> declaraciones . sentencia_mientras
-    (8) declaraciones -> declaraciones . sentencia_para
-    (9) declaraciones -> declaraciones . sentencia_repetir
-    (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
-    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
-    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
-    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
-    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
-
-    FIN_SI          shift and go to state 94
-    TIPO            shift and go to state 15
-    IDENTIFICADOR   shift and go to state 16
-    SI              shift and go to state 17
-    MIENTRAS        shift and go to state 18
-    PARA            shift and go to state 19
-    REPETIR         shift and go to state 20
-    MOSTRAR         shift and go to state 21
-
-    declaracion_simple             shift and go to state 6
-    declaracion_con_asignacion     shift and go to state 7
-    constante                      shift and go to state 8
-    asignacion                     shift and go to state 9
-    sentencia_if                   shift and go to state 10
-    sentencia_mientras             shift and go to state 11
-    sentencia_para                 shift and go to state 12
-    sentencia_repetir              shift and go to state 13
-    sentencia_mostrar              shift and go to state 14
-
 state 92
 
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER . declaraciones FIN_PARA
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER . declaraciones FIN_PARA
     (2) declaraciones -> . declaraciones declaracion_simple
     (3) declaraciones -> . declaraciones declaracion_con_asignacion
     (4) declaraciones -> . declaraciones constante
@@ -2916,12 +2992,12 @@ state 92
     REPETIR         reduce using rule 12 (empty -> .)
     MOSTRAR         reduce using rule 12 (empty -> .)
 
-    declaraciones                  shift and go to state 95
+    declaraciones                  shift and go to state 96
     empty                          shift and go to state 4
 
 state 93
 
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO . expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO . expresion HACER declaraciones FIN_PARA
     (20) expresion -> . LITERAL_ENTERO
     (21) expresion -> . LITERAL_DECIMAL
     (22) expresion -> . LITERAL_CADENA
@@ -2940,6 +3016,7 @@ state 93
     (35) expresion -> . expresion MENOR_IGUAL expresion
     (36) expresion -> . expresion IGUAL_IGUAL expresion
     (37) expresion -> . expresion DIFERENTE expresion
+    (38) expresion -> . PARENTESIS_IZQ expresion PARENTESIS_DER
 
     LITERAL_ENTERO  shift and go to state 30
     LITERAL_DECIMAL shift and go to state 31
@@ -2947,31 +3024,32 @@ state 93
     LITERAL_BOOLEANO shift and go to state 33
     IDENTIFICADOR   shift and go to state 34
     NOT             shift and go to state 35
+    PARENTESIS_IZQ  shift and go to state 36
 
-    expresion                      shift and go to state 96
+    expresion                      shift and go to state 97
 
 state 94
 
-    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .
+    (18) sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .
 
-    FIN             reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    TIPO            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    IDENTIFICADOR   reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    SI              reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    MIENTRAS        reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    PARA            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    REPETIR         reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    MOSTRAR         reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    HASTA_QUE       reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    FIN_SI          reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    SINO            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    FIN_MIENTRAS    reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
-    FIN_PARA        reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    FIN             reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    TIPO            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    IDENTIFICADOR   reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    SI              reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    MIENTRAS        reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    PARA            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    REPETIR         reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    MOSTRAR         reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    HASTA_QUE       reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    FIN_SI          reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    SINO            reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    FIN_MIENTRAS    reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
+    FIN_PARA        reduce using rule 18 (sentencia_repetir -> REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA .)
 
 
 state 95
 
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones . FIN_PARA
+    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones . FIN_SI
     (2) declaraciones -> declaraciones . declaracion_simple
     (3) declaraciones -> declaraciones . declaracion_con_asignacion
     (4) declaraciones -> declaraciones . constante
@@ -2981,19 +3059,19 @@ state 95
     (8) declaraciones -> declaraciones . sentencia_para
     (9) declaraciones -> declaraciones . sentencia_repetir
     (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
     (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
     (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
     (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
 
-    FIN_PARA        shift and go to state 97
+    FIN_SI          shift and go to state 98
     TIPO            shift and go to state 15
     IDENTIFICADOR   shift and go to state 16
     SI              shift and go to state 17
@@ -3014,7 +3092,50 @@ state 95
 
 state 96
 
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion . HACER declaraciones FIN_PARA
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones . FIN_PARA
+    (2) declaraciones -> declaraciones . declaracion_simple
+    (3) declaraciones -> declaraciones . declaracion_con_asignacion
+    (4) declaraciones -> declaraciones . constante
+    (5) declaraciones -> declaraciones . asignacion
+    (6) declaraciones -> declaraciones . sentencia_if
+    (7) declaraciones -> declaraciones . sentencia_mientras
+    (8) declaraciones -> declaraciones . sentencia_para
+    (9) declaraciones -> declaraciones . sentencia_repetir
+    (10) declaraciones -> declaraciones . sentencia_mostrar
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
+    (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
+    (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
+    (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
+
+    FIN_PARA        shift and go to state 99
+    TIPO            shift and go to state 15
+    IDENTIFICADOR   shift and go to state 16
+    SI              shift and go to state 17
+    MIENTRAS        shift and go to state 18
+    PARA            shift and go to state 19
+    REPETIR         shift and go to state 20
+    MOSTRAR         shift and go to state 21
+
+    declaracion_simple             shift and go to state 6
+    declaracion_con_asignacion     shift and go to state 7
+    constante                      shift and go to state 8
+    asignacion                     shift and go to state 9
+    sentencia_if                   shift and go to state 10
+    sentencia_mientras             shift and go to state 11
+    sentencia_para                 shift and go to state 12
+    sentencia_repetir              shift and go to state 13
+    sentencia_mostrar              shift and go to state 14
+
+state 97
+
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion . HACER declaraciones FIN_PARA
     (25) expresion -> expresion . SUMA expresion
     (26) expresion -> expresion . RESTA expresion
     (27) expresion -> expresion . MULTIPLICACION expresion
@@ -3028,43 +3149,62 @@ state 96
     (36) expresion -> expresion . IGUAL_IGUAL expresion
     (37) expresion -> expresion . DIFERENTE expresion
 
-    HACER           shift and go to state 98
-    SUMA            shift and go to state 45
-    RESTA           shift and go to state 46
-    MULTIPLICACION  shift and go to state 47
-    DIVISION        shift and go to state 48
-    AND             shift and go to state 49
-    OR              shift and go to state 50
-    MAYOR_QUE       shift and go to state 51
-    MENOR_QUE       shift and go to state 52
-    MAYOR_IGUAL     shift and go to state 53
-    MENOR_IGUAL     shift and go to state 54
-    IGUAL_IGUAL     shift and go to state 55
-    DIFERENTE       shift and go to state 56
-
-
-state 97
-
-    (16) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .
-
-    FIN             reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    TIPO            reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    IDENTIFICADOR   reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    SI              reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    MIENTRAS        reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    PARA            reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    REPETIR         reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    MOSTRAR         reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    HASTA_QUE       reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    FIN_SI          reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    SINO            reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    FIN_MIENTRAS    reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
-    FIN_PARA        reduce using rule 16 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    HACER           shift and go to state 100
+    SUMA            shift and go to state 46
+    RESTA           shift and go to state 47
+    MULTIPLICACION  shift and go to state 48
+    DIVISION        shift and go to state 49
+    AND             shift and go to state 50
+    OR              shift and go to state 51
+    MAYOR_QUE       shift and go to state 52
+    MENOR_QUE       shift and go to state 53
+    MAYOR_IGUAL     shift and go to state 54
+    MENOR_IGUAL     shift and go to state 55
+    IGUAL_IGUAL     shift and go to state 56
+    DIFERENTE       shift and go to state 57
 
 
 state 98
 
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER . declaraciones FIN_PARA
+    (14) sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .
+
+    FIN             reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    TIPO            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    IDENTIFICADOR   reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    SI              reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    MIENTRAS        reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    PARA            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    REPETIR         reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    MOSTRAR         reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    HASTA_QUE       reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    FIN_SI          reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    SINO            reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    FIN_MIENTRAS    reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+    FIN_PARA        reduce using rule 14 (sentencia_if -> SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI .)
+
+
+state 99
+
+    (16) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .
+
+    FIN             reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    TIPO            reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    IDENTIFICADOR   reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    SI              reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    MIENTRAS        reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    PARA            reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    REPETIR         reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    MOSTRAR         reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    HASTA_QUE       reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    FIN_SI          reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    SINO            reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    FIN_MIENTRAS    reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+    FIN_PARA        reduce using rule 16 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA .)
+
+
+state 100
+
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER . declaraciones FIN_PARA
     (2) declaraciones -> . declaraciones declaracion_simple
     (3) declaraciones -> . declaraciones declaracion_con_asignacion
     (4) declaraciones -> . declaraciones constante
@@ -3086,12 +3226,12 @@ state 98
     REPETIR         reduce using rule 12 (empty -> .)
     MOSTRAR         reduce using rule 12 (empty -> .)
 
-    declaraciones                  shift and go to state 99
+    declaraciones                  shift and go to state 101
     empty                          shift and go to state 4
 
-state 99
+state 101
 
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones . FIN_PARA
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones . FIN_PARA
     (2) declaraciones -> declaraciones . declaracion_simple
     (3) declaraciones -> declaraciones . declaracion_con_asignacion
     (4) declaraciones -> declaraciones . constante
@@ -3101,19 +3241,19 @@ state 99
     (8) declaraciones -> declaraciones . sentencia_para
     (9) declaraciones -> declaraciones . sentencia_repetir
     (10) declaraciones -> declaraciones . sentencia_mostrar
-    (40) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
-    (41) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
-    (43) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
-    (42) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (41) declaracion_simple -> . TIPO IDENTIFICADOR PUNTO_COMA
+    (42) declaracion_con_asignacion -> . TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+    (44) constante -> . TIPO IDENTIFICADOR ASIGNACION expresion
+    (43) asignacion -> . IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
     (13) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     (14) sentencia_if -> . SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI
     (15) sentencia_mientras -> . MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS
-    (16) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
-    (17) sentencia_para -> . PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
+    (16) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
+    (17) sentencia_para -> . PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA
     (18) sentencia_repetir -> . REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA
     (19) sentencia_mostrar -> . MOSTRAR lista_expresiones PUNTO_COMA
 
-    FIN_PARA        shift and go to state 100
+    FIN_PARA        shift and go to state 102
     TIPO            shift and go to state 15
     IDENTIFICADOR   shift and go to state 16
     SI              shift and go to state 17
@@ -3132,21 +3272,21 @@ state 99
     sentencia_repetir              shift and go to state 13
     sentencia_mostrar              shift and go to state 14
 
-state 100
+state 102
 
-    (17) sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .
+    (17) sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .
 
-    FIN             reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    TIPO            reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    IDENTIFICADOR   reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    SI              reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    MIENTRAS        reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    PARA            reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    REPETIR         reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    MOSTRAR         reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    HASTA_QUE       reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    FIN_SI          reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    SINO            reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    FIN_MIENTRAS    reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
-    FIN_PARA        reduce using rule 17 (sentencia_para -> PARA TIPO IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    FIN             reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    TIPO            reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    IDENTIFICADOR   reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    SI              reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    MIENTRAS        reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    PARA            reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    REPETIR         reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    MOSTRAR         reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    HASTA_QUE       reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    FIN_SI          reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    SINO            reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    FIN_MIENTRAS    reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
+    FIN_PARA        reduce using rule 17 (sentencia_para -> PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA .)
 
