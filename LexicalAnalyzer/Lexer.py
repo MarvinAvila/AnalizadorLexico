@@ -53,7 +53,7 @@ tokens = [
 
 # 🔹 Tipos de Datos (entero, decimal, cadena, booleano, constante)
 def t_TIPO(t):
-    r"\b(entero|decimal|cadena|booleano|constante)\b"  # Solo estos tipos de datos
+    r"\b(entero|decimal|cadena|booleano|constante)\b"  
     #print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 
@@ -61,7 +61,7 @@ def t_TIPO(t):
 # 🔹 Valores booleanos (verdadero, falso)
 def t_LITERAL_BOOLEANO(t):
     r"\b(verdadero|falso)\b"
-    t.value = ("BOOLEANO", t.value == "verdadero")  # 🔥 Convertir a `True/False`
+    t.value = ("BOOLEANO", t.value == "verdadero")  # Convertir a `True/False`
     #print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 
@@ -95,8 +95,8 @@ def t_LITERAL_ENTERO(t):
 
 # 🔹 Cadenas de texto entre comillas
 def t_LITERAL_CADENA(t):
-    r'"[^"]*"'  # 🔥 Coincide con cualquier texto entre comillas dobles
-    t.value = ("CADENA", t.value.strip('"'))  # 🔥 Remueve las comillas al almacenar
+    r'"[^"]*"'  # Coincide con cualquier texto entre comillas dobles
+    t.value = ("CADENA", t.value.strip('"'))  # Remueve las comillas al almacenar
     #print(f"📌 Token detectado: LITERAL_CADENA -> {t.value}")
     return t
 

@@ -66,16 +66,16 @@ def p_sentencia_if(p):
     """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
     tipo_condicion, valor_condicion = p[3]
-    if normalizar_tipo(tipo_condicion) != "booleano":  # Usar tipo normalizado
+    if normalizar_tipo(tipo_condicion) != "booleano": 
         semantic_errors.append("La condición del 'si' debe ser booleana, pero se encontró {tipo_condicion}")
-    if len(p) == 6:  # IF sin ELSE
+    if len(p) == 6:  
         print(f"📌 Sentencia IF detectada: condición={valor_condicion}")
-    else:  # IF con ELSE
+    else:  
         print(f"📌 Sentencia IF-ELSE detectada: condición={valor_condicion}")
 
 def p_sentencia_mientras(p):
     """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
-    tipo_condicion, valor_condicion = p[3]  # Asegúrate de que p[3] sea la expresión de la condición
+    tipo_condicion, valor_condicion = p[3]  
     if normalizar_tipo(tipo_condicion) != "booleano":
         semantic_errors.append("La condición del 'mientras' debe ser booleana, pero se encontró {tipo_condicion}")
     print(f"📌 Sentencia MIENTRAS detectada: condición={valor_condicion}")
@@ -115,7 +115,7 @@ def p_sentencia_mostrar(p):
     '''sentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMA'''
     mensaje = " ".join(str(exp[1]) for exp in p[2])  # Concatenar todas las expresiones
     print(f"📢 Mostrando: {mensaje}")
-    if parser.mostrar_en_consola:  # 🔥 Verificar si la función está definida
+    if parser.mostrar_en_consola: 
         parser.mostrar_en_consola(f"📢 Mostrando: {mensaje}")
 
 def p_expresion(p):
@@ -139,7 +139,7 @@ def p_expresion(p):
                  | expresion DIFERENTE expresion
                  | PARENTESIS_IZQ expresion PARENTESIS_DER"""
     
-    print(f"📌 Procesando expresión: {p[:]}")  # Mensaje de depuración
+    print(f"📌 Procesando expresión: {p[:]}") 
 
     if len(p) == 2:  # 📌 Caso: Literales o identificadores
         if isinstance(p[1], tuple):  # Extraer tipo y valor de un literal
@@ -276,20 +276,20 @@ def p_asignacion(p):
     tipo_valor, valor = p[3]
     
     print(f"📌 Asignación detectada: {nombre_variable} = {valor} ({tipo_valor})")
-        # ❌ Si la variable ya es inválida, evitar su uso
+        # Si la variable ya es inválida, evitar su uso
     if valor_actual is None:
         semantic_errors.append(f"No se puede asignar a '{nombre_variable}' porque tiene un valor inválido debido a un error previo.")
         print(f"🚨 Error: Intento de usar una variable inválida ({nombre_variable}).")
         return
 
-    # 🛑 Si la asignación no es válida, marcar la variable como inválida
+    # Si la asignación no es válida, marcar la variable como inválida
     if not es_tipo_valido(tipo_variable, tipo_valor):
         semantic_errors.append(f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})")
         variables[nombre_variable] = (tipo_variable, None)  # 🚨 Marcar la variable como inválida
-        print(f"❌ Error semántico: {nombre_variable} es inválida después de esta asignación.")
+        print(f" Error semántico: {nombre_variable} es inválida después de esta asignación.")
         return
 
-    # ✅ Si la asignación es válida, actualizar el valor
+    # Si la asignación es válida, actualizar el valor
     variables[nombre_variable] = (tipo_variable, valor)
     print(f"✔️ Asignación válida: {nombre_variable} = {valor}")
 
@@ -324,14 +324,14 @@ def es_tipo_valido(tipo_variable, tipo_valor):
     
     return tipo_valor in tipos_permitidos[tipo_variable]
 
-syntax_errors = []  # Lista para errores sintácticos
-semantic_errors = []  # Lista para errores semánticos
+syntax_errors = []  
+semantic_errors = []
 
 def p_error(p):
     """Manejo de errores de sintaxis sin interrumpir el análisis."""
     if p:
         error_msg = f"❌ Error de sintaxis en línea {p.lineno}: Token inesperado '{p.value}'"
-        syntax_errors.append(error_msg)  # Agregar error a la lista
+        syntax_errors.append(error_msg)  
         print(error_msg)
     else:
         error_msg = "❌ Error de sintaxis: Fin de archivo inesperado"

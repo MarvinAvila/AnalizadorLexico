@@ -174,20 +174,20 @@ class CompilerApp:
     def analyze_code(self):
         print("\n🚀 Iniciando análisis de código...")
         
-        # 🔹 1️⃣ Limpiar la consola antes de cada análisis
+        # 🔹 Limpiar la consola antes de cada análisis
         self.console.config(state=tk.NORMAL)
         self.console.delete("1.0", tk.END)
         self.console.config(state=tk.DISABLED)
 
-        # 🔹 2️⃣ Limpiar la tabla de errores antes de cada análisis
+        # 🔹 Limpiar la tabla de errores antes de cada análisis
         self.error_list.delete(*self.error_list.get_children())
 
-        # 🔹 3️⃣ Reiniciar listas de errores globales
+        # 🔹 Reiniciar listas de errores globales
         from SyntaxAnalyzer.Parser import syntax_errors, semantic_errors
         syntax_errors.clear()
         semantic_errors.clear()
         
-        # 🔹 4️⃣ LIMPIAR LAS VARIABLES Y CONSTANTES PREVIAS
+        # 🔹 LIMPIAR LAS VARIABLES Y CONSTANTES PREVIAS
         variables.clear()
         constantes.clear()
 
