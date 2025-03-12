@@ -54,7 +54,7 @@ tokens = [
 # 🔹 Tipos de Datos (entero, decimal, cadena, booleano, constante)
 def t_TIPO(t):
     r"\b(entero|decimal|cadena|booleano|constante)\b"  # Solo estos tipos de datos
-    print(f"📌 Token detectado: {t.type} -> {t.value}")
+    #print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 
 
@@ -62,14 +62,14 @@ def t_TIPO(t):
 def t_LITERAL_BOOLEANO(t):
     r"\b(verdadero|falso)\b"
     t.value = ("BOOLEANO", t.value == "verdadero")  # 🔥 Convertir a `True/False`
-    print(f"📌 Token detectado: {t.type} -> {t.value}")
+    #print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 
 
 def t_IDENTIFICADOR(t):
     r"[a-zA-Z_][a-zA-Z0-9_]*"
     t.type = reserved.get(t.value, "IDENTIFICADOR")  # Verifica si es palabra reservada
-    print(f"📌 Token detectado: {t.type} -> {t.value}")
+    #print(f"📌 Token detectado: {t.type} -> {t.value}")
     return t
 
 
@@ -81,7 +81,7 @@ t_PUNTO_COMA = r";"
 def t_LITERAL_DECIMAL(t):
     r"\d+\.\d+"
     t.value = ("DECIMAL", float(t.value))
-    print(f"📌 Token detectado: LITERAL_DECIMAL -> {t.value}")
+    #print(f"📌 Token detectado: LITERAL_DECIMAL -> {t.value}")
     return t
 
 
@@ -89,7 +89,7 @@ def t_LITERAL_DECIMAL(t):
 def t_LITERAL_ENTERO(t):
     r"\d+"
     t.value = ("ENTERO", int(t.value))
-    print(f"📌 Token detectado: LITERAL_ENTERO -> {t.value}")
+    #print(f"📌 Token detectado: LITERAL_ENTERO -> {t.value}")
     return t
 
 
@@ -97,7 +97,7 @@ def t_LITERAL_ENTERO(t):
 def t_LITERAL_CADENA(t):
     r'"[^"]*"'  # 🔥 Coincide con cualquier texto entre comillas dobles
     t.value = ("CADENA", t.value.strip('"'))  # 🔥 Remueve las comillas al almacenar
-    print(f"📌 Token detectado: LITERAL_CADENA -> {t.value}")
+    #print(f"📌 Token detectado: LITERAL_CADENA -> {t.value}")
     return t
 
 
@@ -139,9 +139,14 @@ def t_ignore_COMENTARIO(t):
 # ------------------------ Manejo de Errores ------------------------
 
 
+lex_errors = []  # Lista para almacenar errores léxicos
+
 def t_error(t):
-    print(f"❌ Error léxico: Carácter inesperado '{t.value[0]}'")
-    t.lexer.skip(1)
+    error_msg = f"❌ Error léxico en línea {t.lineno}: Carácter inesperado '{t.value[0]}'"
+    lex_errors.append(error_msg)  # Agregar error a la lista
+    print(error_msg)
+    t.lexer.skip(1)  # Saltar el carácter erróneo y continuar
+
 
 # ------------------------ Construcción del Lexer ------------------------
 
