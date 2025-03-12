@@ -7,7 +7,7 @@ from tkinter import ttk, scrolledtext
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from LexicalAnalyzer.Lexer import lexer  
-from SyntaxAnalyzer.Parser import parser, SemanticError, TIPOS_DE_DATOS
+from SyntaxAnalyzer.Parser import parser, SemanticError, TIPOS_DE_DATOS,variables, constantes
 from LexicalAnalyzer.Lexer import reserved 
 from Executor.Runner import run_code  
 
@@ -110,7 +110,6 @@ class CompilerApp:
         self.text_area.tag_configure("comment", foreground="#808080", font=("Consolas", 10, "italic"))
         self.text_area.tag_configure("string", foreground="#008000")  # Verde oscuro
         self.text_area.tag_configure("operator", foreground="black", font=("TkDefaultFont", 10, "bold"))
-        self.text_area.tag_configure("comparator", foreground="#FF4500")  # Naranja
         self.text_area.tag_configure("boolean", foreground="#B22222")   # Rojo oscuro
 
         # 🔹 Limpiar resaltado previo
@@ -126,9 +125,11 @@ class CompilerApp:
             self._apply_highlight("boolean", word)
         for op in operators:
             self._apply_regex_highlight("operator", op)
-        for comp in comparators:
-            self._apply_regex_highlight("comparator", comp)
 
+
+        # 🔹 Asegurar que palabras clave no se mezclen con paréntesis o símbolos
+        self._apply_regex_highlight("keyword", r'\b(?:' + '|'.join(keywords) + r')\b(?!\s*\))')
+        
         # 🔹 Resaltar comentarios correctamente
         self._apply_regex_highlight("comment", r"//.*")
 
@@ -139,8 +140,6 @@ class CompilerApp:
         self.text_area.tag_remove("operator", "1.0", tk.END)
         self._apply_regex_highlight("operator", r'\b(?:' + '|'.join(operators) + r')\b')
 
-        # 🔹 Asegurar que palabras clave no se mezclen con paréntesis o símbolos
-        self._apply_regex_highlight("keyword", r'\b(?:' + '|'.join(keywords) + r')\b(?!\s*\))')
 
 
     def _apply_highlight(self, tag, word):
@@ -175,14 +174,26 @@ class CompilerApp:
     def analyze_code(self):
         print("\n🚀 Iniciando análisis de código...")
         
-        # Obtener el código fuente del área de texto
-        code = self.text_area.get("1.0", tk.END).strip()
-        print(f"📌 Código ingresado:\n{code}\n")
+        # 🔹 1️⃣ Limpiar la consola antes de cada análisis
+        self.console.config(state=tk.NORMAL)
+        self.console.delete("1.0", tk.END)
+        self.console.config(state=tk.DISABLED)
 
-        # Reiniciar listas de errores globales
+        # 🔹 2️⃣ Limpiar la tabla de errores antes de cada análisis
+        self.error_list.delete(*self.error_list.get_children())
+
+        # 🔹 3️⃣ Reiniciar listas de errores globales
         from SyntaxAnalyzer.Parser import syntax_errors, semantic_errors
         syntax_errors.clear()
         semantic_errors.clear()
+        
+        # 🔹 4️⃣ LIMPIAR LAS VARIABLES Y CONSTANTES PREVIAS
+        variables.clear()
+        constantes.clear()
+
+        # Obtener el código fuente del área de texto
+        code = self.text_area.get("1.0", tk.END).strip()
+        print(f"📌 Código ingresado:\n{code}\n")
 
         # Pasar el código al lexer para generar tokens
         lexer.input(code)
@@ -191,7 +202,7 @@ class CompilerApp:
 
         # Recorrer los tokens generados por el lexer
         for tok in lexer:
-            print(f"🔹 Token detectado: {tok.type} -> {tok.value}")
+            #print(f"🔹 Token detectado: {tok.type} -> {tok.value}")
             tokens.append((tok.type, tok.value))
 
         execution_errors = []

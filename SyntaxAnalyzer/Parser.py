@@ -141,34 +141,42 @@ def p_expresion(p):
     
     print(f"📌 Procesando expresión: {p[:]}")  # Mensaje de depuración
 
-    if len(p) == 2:  # Literales o identificadores
-        if isinstance(p[1], tuple):  # Extraer tipo y valor
+    if len(p) == 2:  # 📌 Caso: Literales o identificadores
+        if isinstance(p[1], tuple):  # Extraer tipo y valor de un literal
             tipo_valor, valor = p[1]
             p[0] = (normalizar_tipo(tipo_valor), valor)
-        elif isinstance(p[1], str) and p[1] in variables:
-            tipo_variable, valor_variable = variables[p[1]]
-            p[0] = (normalizar_tipo(tipo_variable), valor_variable)
-        elif isinstance(p[1], str) and p[1] in constantes:
-            tipo_constante, valor_constante = constantes[p[1]]
-            p[0] = (normalizar_tipo(tipo_constante), valor_constante)
-        else:
-            semantic_errors.append(f"Variable '{p[1]}' no definida")
-            p[0] = ("error", None)  # Evitar acceso a None
 
-    elif len(p) == 4 and p[1] == '(' and p[3] == ')':  # Expresión entre paréntesis
+        elif isinstance(p[1], str):  # 📌 Caso: Identificadores (variables o constantes)
+            if p[1] in variables:
+                tipo_variable, valor_variable = variables[p[1]]
+
+                # 🚨 Si la variable es inválida, generar un error y detener la evaluación
+                if valor_variable is None:
+                    semantic_errors.append(f"❌ Error: La variable '{p[1]}' es inválida y no puede usarse en expresiones.")
+                    print(f"🚨 Error semántico: Uso de variable inválida ({p[1]}) en expresión.")
+                    p[0] = ("error", None)
+                    return
+
+                p[0] = (normalizar_tipo(tipo_variable), valor_variable)
+
+            elif p[1] in constantes:
+                tipo_constante, valor_constante = constantes[p[1]]
+                p[0] = (normalizar_tipo(tipo_constante), valor_constante)
+            else:
+                semantic_errors.append(f"❌ Error: Variable '{p[1]}' no definida.")
+                p[0] = ("error", None)  # Evitar acceso a None
+
+    elif len(p) == 4 and p[1] == '(' and p[3] == ')':  # 📌 Caso: Expresión entre paréntesis
         p[0] = p[2]
 
-    else:  # Operaciones aritméticas, lógicas o de comparación
-        if p[1] is None or p[3] is None:  # Evitar errores si p[1] o p[3] no están definidos
-            semantic_errors.append(f"Error en la operación '{p[2]}': uno de los operandos no es válido")
-            p[0] = ("error", None)
-            return
-
+    else:  # 📌 Caso: Operaciones aritméticas, lógicas o de comparación
         tipo1, val1 = p[1] if isinstance(p[1], tuple) else ("error", None)
         tipo2, val2 = p[3] if isinstance(p[3], tuple) else ("error", None)
 
-        if tipo1 == "error" or tipo2 == "error":
-            semantic_errors.append(f"Error en la operación '{p[2]}': operandos inválidos")
+        # 🚨 Si alguno de los operandos es inválido, generar un error y detener la evaluación
+        if val1 is None or val2 is None:
+            semantic_errors.append(f"❌ Error en la operación '{p[2]}': Un operando es inválido.")
+            print(f"🚨 Error semántico: Intento de operar con valores inválidos ({p[1]} {p[2]} {p[3]}).")
             p[0] = ("error", None)
             return
 
@@ -200,8 +208,9 @@ def p_expresion(p):
             elif p[2] == '!=':
                 p[0] = ("booleano", val1 != val2)
         except Exception as e:
-            semantic_errors.append(f"Error en la operación '{p[2]}': {str(e)}")
+            semantic_errors.append(f"❌ Error en la operación '{p[2]}': {str(e)}")
             p[0] = ("error", None)
+
 
 def p_lista_expresiones(p):
     '''lista_expresiones : lista_expresiones COMA expresion
@@ -216,9 +225,22 @@ def p_declaracion_simple(p):
     print(f"➡️ Entrando a `p_declaracion_simple()`, Tokens: {p[:]}")
     tipo_variable = p[1]
     nombre_variable = p[2]
-    variables[nombre_variable] = (tipo_variable, None)
+
+    # Asignar un valor por defecto dependiendo del tipo
+    if tipo_variable == "entero":
+        valor_inicial = 0
+    elif tipo_variable == "decimal":
+        valor_inicial = 0.0
+    elif tipo_variable == "cadena":
+        valor_inicial = ""
+    elif tipo_variable == "booleano":
+        valor_inicial = False
+    else:
+        valor_inicial = None  # Para tipos no reconocidos
+
+    variables[nombre_variable] = (tipo_variable, valor_inicial)
     print(
-        f"✔️ Declaración válida: {nombre_variable} es de tipo {tipo_variable} (sin valor asignado)"
+        f"✔️ Declaración válida: {nombre_variable} es de tipo {tipo_variable} (valor inicial: {valor_inicial})"
     )
 
 def p_declaracion_con_asignacion(p):
@@ -234,6 +256,9 @@ def p_declaracion_con_asignacion(p):
         error_msg = f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})"
         semantic_errors.append(error_msg)  # Agregar error a la lista en vez de lanzar excepción
         print(f"❌ Error semántico: {error_msg}")
+        
+        variables[nombre_variable] = (tipo_variable, None)  # `None` indica que la variable es inválida
+        return
     else:
         variables[nombre_variable] = (tipo_variable, valor)
         print(f"✔️ Declaración válida: {nombre_variable} = {valor}")
@@ -241,14 +266,30 @@ def p_declaracion_con_asignacion(p):
 def p_asignacion(p):
     """asignacion : IDENTIFICADOR ASIGNACION expresion PUNTO_COMA"""
     print(f"➡️ Entrando a `p_asignacion()`, Tokens: {p[:]}")
+    
     nombre_variable = p[1]
     if nombre_variable not in variables:
         semantic_errors.append(f"La variable '{nombre_variable}' no ha sido declarada")
-    tipo_variable = variables[nombre_variable][0]
+        return
+    
+    tipo_variable, valor_actual = variables[nombre_variable]  # Obtener el tipo y valor actual
     tipo_valor, valor = p[3]
+    
     print(f"📌 Asignación detectada: {nombre_variable} = {valor} ({tipo_valor})")
+        # ❌ Si la variable ya es inválida, evitar su uso
+    if valor_actual is None:
+        semantic_errors.append(f"No se puede asignar a '{nombre_variable}' porque tiene un valor inválido debido a un error previo.")
+        print(f"🚨 Error: Intento de usar una variable inválida ({nombre_variable}).")
+        return
+
+    # 🛑 Si la asignación no es válida, marcar la variable como inválida
     if not es_tipo_valido(tipo_variable, tipo_valor):
         semantic_errors.append(f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})")
+        variables[nombre_variable] = (tipo_variable, None)  # 🚨 Marcar la variable como inválida
+        print(f"❌ Error semántico: {nombre_variable} es inválida después de esta asignación.")
+        return
+
+    # ✅ Si la asignación es válida, actualizar el valor
     variables[nombre_variable] = (tipo_variable, valor)
     print(f"✔️ Asignación válida: {nombre_variable} = {valor}")
 
