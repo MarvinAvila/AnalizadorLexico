@@ -1,4 +1,6 @@
 import ply.lex as lex
+# Lexer.py
+from GlobalErrors.ErrorsManager import global_errors
 
 # ------------------------ Definición de Tokens ------------------------
 
@@ -70,6 +72,7 @@ def t_IDENTIFICADOR(t):
     r"[a-zA-Z_][a-zA-Z0-9_]*"
     t.type = reserved.get(t.value, "IDENTIFICADOR")  # Verifica si es palabra reservada
     #print(f"📌 Token detectado: {t.type} -> {t.value}")
+    #print(f"DEBUG: Token '{t.value}' en línea {t.lineno}")
     return t
 
 
@@ -128,13 +131,20 @@ t_MENOR_IGUAL = r'<='
 t_IGUAL_IGUAL = r'=='
 t_DIFERENTE = r'!='
 
-# 🔹 Ignorar espacios en blanco
-t_ignore = " \t\n"
+# ------------------------ Corrección de Contadores de Línea ------------------------
 
-# 🔹 Ignorar comentarios
+# Regla para contar líneas nuevas y asegurarse de que se registren correctamente
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+# 🔹 Ignorar comentarios Y contar sus saltos de línea
 def t_ignore_COMENTARIO(t):
     r'//.*'
-    pass  # Ignora los comentarios
+    t.lexer.lineno += t.value.count("\n")  # Contar saltos de línea en comentarios
+
+# 🔹 Ignorar espacios en blanco
+t_ignore = " \t"
 
 # ------------------------ Manejo de Errores ------------------------
 
@@ -142,11 +152,13 @@ def t_ignore_COMENTARIO(t):
 lex_errors = []  # Lista para almacenar errores léxicos
 
 def t_error(t):
+    """Manejo de errores léxicos"""
+    if t.value[0] == "\n":
+        t.lexer.lineno += 1  # Asegurar que los errores que incluyen \n actualicen la línea
     error_msg = f"❌ Error léxico en línea {t.lineno}: Carácter inesperado '{t.value[0]}'"
-    lex_errors.append(error_msg)  # Agregar error a la lista
+    global_errors.append({"tipo": "léxico", "linea": t.lineno, "mensaje": error_msg})  # Usar errores_globales
     print(error_msg)
-    t.lexer.skip(1)  # Saltar el carácter erróneo y continuar
-
+    t.lexer.skip(1)
 
 # ------------------------ Construcción del Lexer ------------------------
 

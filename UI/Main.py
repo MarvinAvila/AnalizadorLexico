@@ -4,12 +4,14 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 
 # Agregar la ruta del proyecto para importar los módulos
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from LexicalAnalyzer.Lexer import lexer  
-from SyntaxAnalyzer.Parser import parser, SemanticError, TIPOS_DE_DATOS,variables, constantes
-from LexicalAnalyzer.Lexer import reserved 
-from Executor.Runner import run_code  
+from GlobalErrors.ErrorsManager import global_errors
+from LexicalAnalyzer.Lexer import lexer
+from SyntaxAnalyzer.Parser import parser, TIPOS_DE_DATOS, variables, constantes
+from LexicalAnalyzer.Lexer import reserved
+from Executor.Runner import run_code
+
 
 class CompilerApp:
     def __init__(self):
@@ -22,18 +24,34 @@ class CompilerApp:
 
         # Área de texto para ingresar el código con numeración de líneas
         self.text_frame = tk.Frame(main_frame)
-        self.text_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10, sticky="nsew")
+        self.text_frame.grid(
+            row=0, column=0, rowspan=2, padx=10, pady=10, sticky="nsew"
+        )
 
         # Scrollbar compartido
         self.text_scrollbar = tk.Scrollbar(self.text_frame, orient=tk.VERTICAL)
         self.text_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Numeración de líneas
-        self.line_numbers = tk.Text(self.text_frame, width=4, padx=5, pady=5, state=tk.DISABLED, yscrollcommand=self.text_scrollbar.set)
+        self.line_numbers = tk.Text(
+            self.text_frame,
+            width=4,
+            padx=5,
+            pady=5,
+            state=tk.DISABLED,
+            yscrollcommand=self.text_scrollbar.set,
+        )
         self.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
 
         # Área de texto para el código
-        self.text_area = tk.Text(self.text_frame, width=50, height=15, padx=5, pady=5, yscrollcommand=self.sync_scroll)
+        self.text_area = tk.Text(
+            self.text_frame,
+            width=50,
+            height=15,
+            padx=5,
+            pady=5,
+            yscrollcommand=self.sync_scroll,
+        )
         self.text_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.text_scrollbar.config(command=self.sync_scroll)
 
@@ -50,25 +68,33 @@ class CompilerApp:
         table_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
         # Tabla para mostrar errores
-        self.error_list = ttk.Treeview(table_frame, columns=("Error",), show="headings", height=10)
+        self.error_list = ttk.Treeview(
+            table_frame, columns=("Error",), show="headings", height=10
+        )
         self.error_list.heading("Error", text="Errores")
         self.error_list.column("Error", width=350, anchor="w")
         self.error_list.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Consola de salida
-        self.console = scrolledtext.ScrolledText(main_frame, width=50, height=15, padx=5, pady=5)
-        self.console.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.console = scrolledtext.ScrolledText(
+            main_frame, width=50, height=15, padx=5, pady=5
+        )
+        self.console.grid(
+            row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew"
+        )
         self.console.config(state=tk.DISABLED)
 
         # Botón para analizar el código
-        self.analyze_button = tk.Button(main_frame, text="Analizar", command=self.analyze_code)
+        self.analyze_button = tk.Button(
+            main_frame, text="Analizar", command=self.analyze_code
+        )
         self.analyze_button.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
         # Configurar la distribución del grid
         main_frame.columnconfigure(0, weight=1)
         main_frame.columnconfigure(1, weight=1)
         main_frame.rowconfigure(0, weight=1)
-        
+
         # Pasar la función mostrar_en_consola al parser
         parser.mostrar_en_consola = self.mostrar_en_consola
 
@@ -76,7 +102,7 @@ class CompilerApp:
         self.update_line_numbers()
 
     def sync_scroll(self, *args):
-        """ Sincroniza el desplazamiento del área de texto y la numeración de líneas. """
+        """Sincroniza el desplazamiento del área de texto y la numeración de líneas."""
         if args[0] == "scroll":
             self.line_numbers.yview_scroll(int(args[1]), args[2])
             self.text_area.yview_scroll(int(args[1]), args[2])
@@ -107,13 +133,25 @@ class CompilerApp:
         # 🔹 Configurar colores (PSeInt Style)
         self.text_area.tag_configure("keyword", foreground="#0000FF")  # Azul fuerte
         self.text_area.tag_configure("datatype", foreground="#800080")  # Púrpura
-        self.text_area.tag_configure("comment", foreground="#808080", font=("Consolas", 10, "italic"))
+        self.text_area.tag_configure(
+            "comment", foreground="#808080", font=("Consolas", 10, "italic")
+        )
         self.text_area.tag_configure("string", foreground="#008000")  # Verde oscuro
-        self.text_area.tag_configure("operator", foreground="black", font=("TkDefaultFont", 10, "bold"))
-        self.text_area.tag_configure("boolean", foreground="#B22222")   # Rojo oscuro
+        self.text_area.tag_configure(
+            "operator", foreground="black", font=("TkDefaultFont", 10, "bold")
+        )
+        self.text_area.tag_configure("boolean", foreground="#B22222")  # Rojo oscuro
 
         # 🔹 Limpiar resaltado previo
-        for tag in ["keyword", "datatype", "comment", "string", "operator", "comparator", "boolean"]:
+        for tag in [
+            "keyword",
+            "datatype",
+            "comment",
+            "string",
+            "operator",
+            "comparator",
+            "boolean",
+        ]:
             self.text_area.tag_remove(tag, "1.0", tk.END)
 
         # 🔹 Aplicar resaltado
@@ -126,10 +164,11 @@ class CompilerApp:
         for op in operators:
             self._apply_regex_highlight("operator", op)
 
-
         # 🔹 Asegurar que palabras clave no se mezclen con paréntesis o símbolos
-        self._apply_regex_highlight("keyword", r'\b(?:' + '|'.join(keywords) + r')\b(?!\s*\))')
-        
+        self._apply_regex_highlight(
+            "keyword", r"\b(?:" + "|".join(keywords) + r")\b(?!\s*\))"
+        )
+
         # 🔹 Resaltar comentarios correctamente
         self._apply_regex_highlight("comment", r"//.*")
 
@@ -138,15 +177,15 @@ class CompilerApp:
 
         # 🔹 Volver a resaltar operadores para evitar interferencias con el "="
         self.text_area.tag_remove("operator", "1.0", tk.END)
-        self._apply_regex_highlight("operator", r'\b(?:' + '|'.join(operators) + r')\b')
-
-
+        self._apply_regex_highlight("operator", r"\b(?:" + "|".join(operators) + r")\b")
 
     def _apply_highlight(self, tag, word):
         """Aplica resaltado a palabras clave, tipos de datos y booleanos."""
         start = "1.0"
         while True:
-            start = self.text_area.search(r'\m' + word + r'\M', start, stopindex=tk.END, regexp=True)
+            start = self.text_area.search(
+                r"\m" + word + r"\M", start, stopindex=tk.END, regexp=True
+            )
             if not start:
                 break
             end = f"{start}+{len(word)}c"
@@ -164,6 +203,16 @@ class CompilerApp:
             self.text_area.tag_add(tag, start, end)
             start = end
 
+    def highlight_error_line(self, line_number):
+        """Resalta en rojo la línea donde ocurrió un error."""
+        self.text_area.tag_remove("error", "1.0", tk.END)  # 🛑 Primero elimina errores viejos
+
+        if isinstance(line_number, int):
+            start = f"{line_number}.0"
+            end = f"{line_number}.end"
+            self.text_area.tag_add("error", start, end)
+            self.text_area.tag_config("error", background="red", foreground="white")
+
 
     def mostrar_en_consola(self, mensaje):
         """Muestra un mensaje en la consola de salida."""
@@ -174,6 +223,14 @@ class CompilerApp:
     def analyze_code(self):
         print("\n🚀 Iniciando análisis de código...")
         
+        # FORZAR UN ERROR PARA VERIFICAR QUE LA TABLA FUNCIONA
+        global_errors.append({
+            "tipo": "prueba",
+            "linea": 0,
+            "mensaje": "Este es un error de prueba para la tabla"
+        })
+
+
         # 🔹 Limpiar la consola antes de cada análisis
         self.console.config(state=tk.NORMAL)
         self.console.delete("1.0", tk.END)
@@ -182,11 +239,15 @@ class CompilerApp:
         # 🔹 Limpiar la tabla de errores antes de cada análisis
         self.error_list.delete(*self.error_list.get_children())
 
-        # 🔹 Reiniciar listas de errores globales
-        from SyntaxAnalyzer.Parser import syntax_errors, semantic_errors
-        syntax_errors.clear()
-        semantic_errors.clear()
+        self.text_area.tag_remove("error", "1.0", tk.END)
+
+
+        from LexicalAnalyzer.Lexer import lexer
+
+        lexer.lineno = 1
         
+        global_errors.clear()  # Limpiar errores globales antes de cada análisis
+
         # 🔹 LIMPIAR LAS VARIABLES Y CONSTANTES PREVIAS
         variables.clear()
         constantes.clear()
@@ -198,50 +259,93 @@ class CompilerApp:
         # Pasar el código al lexer para generar tokens
         lexer.input(code)
         tokens = []
-        lex_errors = []
 
         # Recorrer los tokens generados por el lexer
+
         for tok in lexer:
-            #print(f"🔹 Token detectado: {tok.type} -> {tok.value}")
-            tokens.append((tok.type, tok.value))
+            token_info = {
+                "type": tok.type,
+                "value": tok.value,
+                "line": tok.lineno,
+                "column": tok.lexpos,
+            }
+            tokens.append(token_info)
+            print(f"🔹 Token detectado: {token_info}")
 
         execution_errors = []
 
         try:
             # Enviar el código al parser para análisis sintáctico
             print("📌 Enviando código al parser...")
-            parser.parse(code, tracking=True)  # 🔥 Aquí se envía el código al parser
+            parser.parse(
+                code, lexer=lexer, tracking=True
+            )  # Aquí se envía el código al parser
             print("✔️ Análisis sintáctico completado.")
-        except SyntaxError as e:
-            syntax_errors.append(str(e))
+        except Exception as e:
+            global_errors.append(
+                {
+                    "tipo": "sintáctico",  # Tipo de error
+                    "linea":0,  # Línea desconocida (puedes cambiarla si tienes acceso a la línea)
+                    "mensaje": str(e),  # Mensaje de error
+                }
+            )
             print(f"❌ Error en el parser: {e}")
-        except SemanticError as e:
-            semantic_errors.append(str(e))
-            print(f"❌ Error semántico: {e}")
 
         # Ejecutar el código si no hay errores sintácticos o semánticos
-        if not syntax_errors and not semantic_errors:
+        if not global_errors:
             try:
                 # Aquí deberías generar el código Python a partir del código fuente
-                python_code = self.generate_python_code(code)  # Implementa esta función si no está
+                python_code = self.generate_python_code(
+                    code
+                )  # Implementa esta función si no está
                 execution_result = run_code(python_code)
                 if "Error de ejecución" in execution_result:
-                    execution_errors.append(execution_result)
+                    # Agregar el error de ejecución con el formato estándar
+                    execution_errors.append(
+                        {
+                            "tipo": "ejecución",
+                            "linea": "desconocida",
+                            "mensaje": execution_result,
+                        }
+                    )
             except Exception as e:
-                execution_errors.append(f"Error de ejecución: {str(e)}")
+                # Agregar el error de ejecución con el formato estándar
+                execution_errors.append(
+                    {
+                        "tipo": "ejecución",
+                        "linea": "desconocida",
+                        "mensaje": f"Error de ejecución: {str(e)}",
+                    }
+                )
+        # Verificar si global_errors tiene contenido
+        print(f"\n📌 Contenido de global_errors antes de verificar:\n{global_errors}")
+        print(f"📌 Contenido de execution_errors antes de verificar: {execution_errors}")
 
-        # Mostrar tokens y errores en la interfaz
-        # self.token_list.delete(*self.token_list.get_children())
-        # for token in tokens:
-        #     self.token_list.insert("", tk.END, values=token)
+        # Verificar si hay errores en la lista global
+        if global_errors or execution_errors:
+            print("\n❌ Errores encontrados durante el análisis:\n")
+            
+            # Agregar los errores a la tabla de la interfaz gráfica
+            for error in global_errors + execution_errors:
+                if isinstance(error, dict) and "mensaje" in error:
+                    self.error_list.insert("", tk.END, values=(error["mensaje"],))  # Agregar error a la tabla
+                    print(f"✅ Error agregado a la tabla: {error['mensaje']}")  # Depuración en consola
+                else:
+                    print(f"⚠️ Error con formato incorrecto: {error}")
 
-        self.error_list.delete(*self.error_list.get_children())
-        for error in lex_errors + syntax_errors + semantic_errors + execution_errors:
-            self.error_list.insert("", tk.END, values=(error,))
+            # Actualizar la tabla para reflejar los cambios
+            self.error_list.update_idletasks()
+        else:
+            print("✔️ No se encontraron errores durante el análisis.")
 
+        # Resaltar líneas con errores
+        for error in global_errors:
+            if "linea" in error and isinstance(error["linea"], int):
+                self.highlight_error_line(error["linea"])
         print("🚀 Análisis finalizado.\n")
+
     def auto_indent(self, event=None):
-        """ Agrega tabulación automática al presionar Enter """
+        """Agrega tabulación automática al presionar Enter"""
         cursor_index = self.text_area.index(tk.INSERT)
         line_start = f"{cursor_index.split('.')[0]}.0"
         current_line = self.text_area.get(line_start, cursor_index)
@@ -256,9 +360,9 @@ class CompilerApp:
         self.text_area.insert(tk.INSERT, "\n" + indentation)
         return "break"  # Evita que Tkinter agregue un salto de línea por defecto
 
-
     def run(self):
         self.root.mainloop()
+
 
 if __name__ == "__main__":
     app = CompilerApp()

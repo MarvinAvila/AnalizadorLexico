@@ -1,5 +1,6 @@
 import ply.yacc as yacc
 from LexicalAnalyzer.Lexer import tokens
+from GlobalErrors.ErrorsManager import global_errors
 
 # Definir precedencia para resolver conflictos
 precedence = (
@@ -25,6 +26,9 @@ TIPOS_DE_DATOS = {
 class SemanticError(Exception):
     """Excepción para errores semánticos."""
     pass
+
+if not isinstance(global_errors, list):
+    global_errors = []
 
 variables = {}  
 constantes = {} 
@@ -65,9 +69,21 @@ def normalizar_tipo(tipo):
 def p_sentencia_if(p):
     """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
     | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
+    # if len(p) < 7 or p[5] != 'ENTONCES':
+    #     error_msg = f"Error de sintaxis: Se esperaba 'ENTONCES' después de la condición en la línea {p.lineno(1)}"
+    #     global_errors.append({
+    #         "tipo": "sintáctico",
+    #         "linea": p.lineno(1),
+    #         "mensaje": error_msg
+    #     })
+    #     return
     tipo_condicion, valor_condicion = p[3]
     if normalizar_tipo(tipo_condicion) != "booleano": 
-        semantic_errors.append("La condición del 'si' debe ser booleana, pero se encontró {tipo_condicion}")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(3),  # Línea donde está la condición
+            "mensaje": f"La condición del 'si' debe ser booleana, pero se encontró {tipo_condicion}"
+        })
     if len(p) == 6:  
         print(f"📌 Sentencia IF detectada: condición={valor_condicion}")
     else:  
@@ -77,7 +93,11 @@ def p_sentencia_mientras(p):
     """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
     tipo_condicion, valor_condicion = p[3]  
     if normalizar_tipo(tipo_condicion) != "booleano":
-        semantic_errors.append("La condición del 'mientras' debe ser booleana, pero se encontró {tipo_condicion}")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(3),  # Línea donde está la condición
+            "mensaje": f"La condición del 'mientras' debe ser booleana, pero se encontró {tipo_condicion}"
+        })
     print(f"📌 Sentencia MIENTRAS detectada: condición={valor_condicion}")
 
 def p_sentencia_para(p):
@@ -89,17 +109,29 @@ def p_sentencia_para(p):
 
     # Verificar que la variable de iteración ya esté declarada
     if nombre_variable not in variables:
-        semantic_errors.append(f"La variable de iteración '{nombre_variable}' no ha sido declarada")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(2),  # Línea donde está el identificador
+            "mensaje": f"La variable de iteración '{nombre_variable}' no ha sido declarada"
+        })
 
     # Verificar que las expresiones DESDE y HASTA sean ENTERO
     if desde_tipo != "entero" or hasta_tipo != "entero":
-        semantic_errors.append(f"Las expresiones DESDE y HASTA deben ser de tipo ENTERO")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(4),  # Línea donde está la expresión DESDE
+            "mensaje": f"Las expresiones DESDE y HASTA deben ser de tipo ENTERO"
+        })
 
     # Manejar el caso con paso
     if len(p) == 11:  # PARA con paso
         paso_tipo, paso_valor = p[8]  # Expresión CON_PASO
         if paso_tipo != "entero":
-            semantic_errors.append(f"El paso debe ser de tipo ENTERO")
+            global_errors.append({
+                "tipo": "semántico",
+                "linea": p.lineno(8),  # Línea donde está la expresión CON_PASO
+                "mensaje": f"El paso debe ser de tipo ENTERO"
+            })
         print(f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}, paso={paso_valor}")
     else:  # PARA sin paso
         print(f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}")
@@ -108,7 +140,11 @@ def p_sentencia_repetir(p):
     """sentencia_repetir : REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
     tipo_condicion, valor_condicion = p[5]  # La condición está en p[5]
     if normalizar_tipo(tipo_condicion) != "booleano":
-        semantic_errors.append(f"La condición del 'repetir' debe ser booleana, pero se encontró {tipo_condicion}")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(5),  # Línea donde está la condición
+            "mensaje": f"La condición del 'repetir' debe ser booleana, pero se encontró {tipo_condicion}"
+        })
     print(f"📌 Sentencia REPETIR detectada: condición={valor_condicion}")
 
 def p_sentencia_mostrar(p):
@@ -152,7 +188,11 @@ def p_expresion(p):
 
                 # 🚨 Si la variable es inválida, generar un error y detener la evaluación
                 if valor_variable is None:
-                    semantic_errors.append(f"❌ Error: La variable '{p[1]}' es inválida y no puede usarse en expresiones.")
+                    global_errors.append({
+                        "tipo": "semántico",
+                        "linea": p.lineno(1),  # Línea donde está el identificador
+                        "mensaje": f"La variable '{p[1]}' es inválida y no puede usarse en expresiones."
+                    })
                     print(f"🚨 Error semántico: Uso de variable inválida ({p[1]}) en expresión.")
                     p[0] = ("error", None)
                     return
@@ -163,7 +203,11 @@ def p_expresion(p):
                 tipo_constante, valor_constante = constantes[p[1]]
                 p[0] = (normalizar_tipo(tipo_constante), valor_constante)
             else:
-                semantic_errors.append(f"❌ Error: Variable '{p[1]}' no definida.")
+                global_errors.append({
+                    "tipo": "semántico",
+                    "linea": p.lineno(1),  # Línea donde está el identificador
+                    "mensaje": f"Variable '{p[1]}' no definida."
+                })
                 p[0] = ("error", None)  # Evitar acceso a None
 
     elif len(p) == 4 and p[1] == '(' and p[3] == ')':  # 📌 Caso: Expresión entre paréntesis
@@ -175,7 +219,11 @@ def p_expresion(p):
 
         # 🚨 Si alguno de los operandos es inválido, generar un error y detener la evaluación
         if val1 is None or val2 is None:
-            semantic_errors.append(f"❌ Error en la operación '{p[2]}': Un operando es inválido.")
+            global_errors.append({
+                "tipo": "semántico",
+                "linea": p.lineno(2),  # Línea donde está la operación
+                "mensaje": f"Error en la operación '{p[2]}': Un operando es inválido."
+            })
             print(f"🚨 Error semántico: Intento de operar con valores inválidos ({p[1]} {p[2]} {p[3]}).")
             p[0] = ("error", None)
             return
@@ -208,7 +256,11 @@ def p_expresion(p):
             elif p[2] == '!=':
                 p[0] = ("booleano", val1 != val2)
         except Exception as e:
-            semantic_errors.append(f"❌ Error en la operación '{p[2]}': {str(e)}")
+            global_errors.append({
+                "tipo": "semántico",
+                "linea": p.lineno(2),  # Línea donde está la operación
+                "mensaje": f"Error en la operación '{p[2]}': {str(e)}"
+            })
             p[0] = ("error", None)
 
 
@@ -251,10 +303,21 @@ def p_declaracion_con_asignacion(p):
     tipo_valor, valor = p[4]  # La expresión ya fue procesada por la regla `expresion`
     
     print(f"📌 Variable detectada: {nombre_variable} ({tipo_variable}) = {valor} ({tipo_valor})")
-
+    if nombre_variable in variables:
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(2),  # Línea donde está el identificador
+            "mensaje": f"La variable '{nombre_variable}' ya ha sido declarada."
+        })
+        return
+    
     if not es_tipo_valido(tipo_variable, tipo_valor):
         error_msg = f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})"
-        semantic_errors.append(error_msg)  # Agregar error a la lista en vez de lanzar excepción
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(2),  # Línea donde está el identificador
+            "mensaje": error_msg
+        })
         print(f"❌ Error semántico: {error_msg}")
         
         variables[nombre_variable] = (tipo_variable, None)  # `None` indica que la variable es inválida
@@ -269,22 +332,36 @@ def p_asignacion(p):
     
     nombre_variable = p[1]
     if nombre_variable not in variables:
-        semantic_errors.append(f"La variable '{nombre_variable}' no ha sido declarada")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(1),  # Línea donde está el identificador
+            "mensaje": f"La variable '{nombre_variable}' no ha sido declarada."
+        })
         return
     
     tipo_variable, valor_actual = variables[nombre_variable]  # Obtener el tipo y valor actual
     tipo_valor, valor = p[3]
     
     print(f"📌 Asignación detectada: {nombre_variable} = {valor} ({tipo_valor})")
-        # Si la variable ya es inválida, evitar su uso
+    
+    # Si la variable ya es inválida, evitar su uso
     if valor_actual is None:
-        semantic_errors.append(f"No se puede asignar a '{nombre_variable}' porque tiene un valor inválido debido a un error previo.")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(1),  # Línea donde está el identificador
+            "mensaje": f"No se puede asignar a '{nombre_variable}' porque tiene un valor inválido debido a un error previo."
+        })
         print(f"🚨 Error: Intento de usar una variable inválida ({nombre_variable}).")
         return
 
     # Si la asignación no es válida, marcar la variable como inválida
     if not es_tipo_valido(tipo_variable, tipo_valor):
-        semantic_errors.append(f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})")
+        error_msg = f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})"
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(1),  # Línea donde está el identificador
+            "mensaje": error_msg
+        })
         variables[nombre_variable] = (tipo_variable, None)  # 🚨 Marcar la variable como inválida
         print(f" Error semántico: {nombre_variable} es inválida después de esta asignación.")
         return
@@ -299,9 +376,17 @@ def p_constante(p):
     nombre_variable = p[2]
     tipo_valor, valor = p[4]
     if nombre_variable in constantes:
-        semantic_errors.append(f"La constante '{nombre_variable}' ya fue declarada")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(2),  # Línea donde está el identificador
+            "mensaje": f"La constante '{nombre_variable}' ya fue declarada"
+        })
     if not es_tipo_valido(tipo_variable, tipo_valor):
-        semantic_errors.append(f"No se puede asignar '{valor}' (tipo {tipo_valor}) a la constante '{nombre_variable}' (tipo {tipo_variable})")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(4),  # Línea donde está la expresión
+            "mensaje": f"No se puede asignar '{valor}' (tipo {tipo_valor}) a la constante '{nombre_variable}' (tipo {tipo_variable})"
+        })
     constantes[nombre_variable] = (tipo_variable, valor)
     print(f"✔️ Constante válida: {nombre_variable} = {valor} ({tipo_variable})")
 
@@ -320,23 +405,32 @@ def es_tipo_valido(tipo_variable, tipo_valor):
     }
     
     if tipo_variable not in tipos_permitidos:
-        semantic_errors.append(f"Tipo de variable '{tipo_variable}' no permitido.")
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": 0, # No hay línea específica aquí
+            "mensaje": f"Tipo de variable '{tipo_variable}' no permitido."
+        })
     
     return tipo_valor in tipos_permitidos[tipo_variable]
 
-syntax_errors = []  
-semantic_errors = []
 
 def p_error(p):
     """Manejo de errores de sintaxis sin interrumpir el análisis."""
     if p:
+        print(f"🔴 Error en línea detectada por PLY: {p.lineno}")  # Depuración
         error_msg = f"❌ Error de sintaxis en línea {p.lineno}: Token inesperado '{p.value}'"
-        syntax_errors.append(error_msg)  
-        print(error_msg)
+        global_errors.append({
+            "tipo": "sintáctico",
+            "linea": p.lineno,
+            "mensaje": error_msg
+        })
     else:
         error_msg = "❌ Error de sintaxis: Fin de archivo inesperado"
-        syntax_errors.append(error_msg)
-
+        global_errors.append({
+            "tipo": "sintáctico",
+            "linea": 0,
+            "mensaje": error_msg
+        })
 
 
 # Construcción del Parser

@@ -1,0 +1,24 @@
+digraph SentenciaSI {
+    rankdir=LR;
+    node [shape = circle];
+
+    q0 [label="q0"];
+    q1 [label="q1"];
+    q2 [label="q2"];
+    q3 [label="q3"];
+    q4 [label="q4"];
+    q5 [label="q5"];
+    q6 [label="q6"];
+    q7 [label="q7"];
+    q8 [label="q8", shape=doublecircle];
+
+    q0 -> q1 [label="si"];
+    q1 -> q2 [label="("];
+    q2 -> q3 [label="expresion"];
+    q3 -> q4 [label=")"];
+    q4 -> q5 [label="entonces"];
+    q5 -> q6 [label="declaraciones"];
+    q6 -> q7 [label="sino", style=dashed];
+    q7 -> q8 [label="declaraciones", style=dashed];
+    q6 -> q8 [label="fin_si"];
+}
