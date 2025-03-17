@@ -154,7 +154,15 @@ class CompilerApp:
         ]:
             self.text_area.tag_remove(tag, "1.0", tk.END)
 
-        # 🔹 Aplicar resaltado
+        # 🔹 Aplicar resaltado en el orden correcto
+
+        # 1. Resaltar comentarios primero
+        self._apply_regex_highlight("comment", r"//.*")
+
+        # 2. Resaltar cadenas de texto
+        self._apply_regex_highlight("string", r'"[^"]*"')
+
+        # 3. Resaltar palabras clave, tipos de datos, operadores, etc.
         for word in keywords:
             self._apply_highlight("keyword", word)
         for word in datatypes:
@@ -168,12 +176,6 @@ class CompilerApp:
         self._apply_regex_highlight(
             "keyword", r"\b(?:" + "|".join(keywords) + r")\b(?!\s*\))"
         )
-
-        # 🔹 Resaltar comentarios correctamente
-        self._apply_regex_highlight("comment", r"//.*")
-
-        # 🔹 Resaltar cadenas correctamente sin Tcl errors
-        self._apply_regex_highlight("string", r'"[^"]*"')
 
         # 🔹 Volver a resaltar operadores para evitar interferencias con el "="
         self.text_area.tag_remove("operator", "1.0", tk.END)
@@ -205,7 +207,7 @@ class CompilerApp:
 
     def highlight_error_line(self, line_number):
         """Resalta en rojo la línea donde ocurrió un error."""
-        self.text_area.tag_remove("error", "1.0", tk.END)  # 🛑 Primero elimina errores viejos
+        self.text_area.tag_remove("error", "1.0", tk.END) 
 
         if isinstance(line_number, int):
             start = f"{line_number}.0"
@@ -243,8 +245,6 @@ class CompilerApp:
 
 
         from LexicalAnalyzer.Lexer import lexer
-
-        lexer.lineno = 1
         
         global_errors.clear()  # Limpiar errores globales antes de cada análisis
 
@@ -254,6 +254,13 @@ class CompilerApp:
 
         # Obtener el código fuente del área de texto
         code = self.text_area.get("1.0", tk.END).strip()
+        
+        # code_lines = code.split("\n")
+        # print("\n📌 Código con números de línea:")
+        # for i, line in enumerate(code_lines, start=1):
+        #     print(f"{i:03d}: {line}")  # 📌 Muestra cada línea con su número real
+        # print("\n")
+        
         print(f"📌 Código ingresado:\n{code}\n")
 
         # Pasar el código al lexer para generar tokens
@@ -262,21 +269,22 @@ class CompilerApp:
 
         # Recorrer los tokens generados por el lexer
 
-        for tok in lexer:
-            token_info = {
-                "type": tok.type,
-                "value": tok.value,
-                "line": tok.lineno,
-                "column": tok.lexpos,
-            }
-            tokens.append(token_info)
-            print(f"🔹 Token detectado: {token_info}")
+        # for tok in lexer:
+        #     token_info = {
+        #         "type": tok.type,
+        #         "value": tok.value,
+        #         "line": tok.lineno,
+        #         "column": tok.lexpos,
+        #     }
+        #     tokens.append(token_info)
+        #     print(f"🔹 Token detectado: {token_info}")
 
         execution_errors = []
 
         try:
             # Enviar el código al parser para análisis sintáctico
             print("📌 Enviando código al parser...")
+            lexer.lineno = 1
             parser.parse(
                 code, lexer=lexer, tracking=True
             )  # Aquí se envía el código al parser

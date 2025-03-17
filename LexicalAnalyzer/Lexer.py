@@ -137,6 +137,7 @@ t_DIFERENTE = r'!='
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    # print(f"📌 Nueva línea detectada: ahora estamos en la línea {t.lexer.lineno}")
 
 # 🔹 Ignorar comentarios Y contar sus saltos de línea
 def t_ignore_COMENTARIO(t):
