@@ -11,6 +11,8 @@ from LexicalAnalyzer.Lexer import lexer
 from SyntaxAnalyzer.Parser import parser, TIPOS_DE_DATOS, variables, constantes
 from LexicalAnalyzer.Lexer import reserved
 from Executor.Runner import run_code
+from SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
+from SyntaxAnalyzer.AST import NodoPrograma, NodoIf, NodoMientras, NodoPara, NodoRepetir, NodoMostrar, NodoBinario, NodoUnario, NodoIdentificador, NodoLiteral
 
 
 class CompilerApp:
@@ -254,104 +256,210 @@ class CompilerApp:
 
         # Obtener el código fuente del área de texto
         code = self.text_area.get("1.0", tk.END).strip()
-        
-        # code_lines = code.split("\n")
-        # print("\n📌 Código con números de línea:")
-        # for i, line in enumerate(code_lines, start=1):
-        #     print(f"{i:03d}: {line}")  # 📌 Muestra cada línea con su número real
-        # print("\n")
-        
         print(f"📌 Código ingresado:\n{code}\n")
+        
+        # --------------------------------------------
+        # 1. Análisis Léxico
+        # --------------------------------------------
 
-        # Pasar el código al lexer para generar tokens
         lexer.input(code)
-        tokens = []
-
-        # Recorrer los tokens generados por el lexer
-
-        # for tok in lexer:
-        #     token_info = {
-        #         "type": tok.type,
-        #         "value": tok.value,
-        #         "line": tok.lineno,
-        #         "column": tok.lexpos,
-        #     }
-        #     tokens.append(token_info)
-        #     print(f"🔹 Token detectado: {token_info}")
-
-        execution_errors = []
-
         try:
-            # Enviar el código al parser para análisis sintáctico
+            # Solo para verificar que el lexer funciona
+            for tok in lexer:
+                pass  # Simplemente consumir todos los tokens
+            print("✔️ Análisis léxico completado.")
+        except Exception as e:
+            global_errors.append({
+                "tipo": "léxico",
+                "linea": 0,
+                "mensaje": f"Error léxico: {str(e)}"
+            })
+
+        # Si hay errores léxicos, detenerse aquí
+        if global_errors:
+            self._mostrar_errores()
+            return
+
+        # --------------------------------------------
+        # 2. Análisis Sintáctico
+        # --------------------------------------------
+        try:
             print("📌 Enviando código al parser...")
             lexer.lineno = 1
-            parser.parse(
-                code, lexer=lexer, tracking=True
-            )  # Aquí se envía el código al parser
-            print("✔️ Análisis sintáctico completado.")
-        except Exception as e:
-            global_errors.append(
-                {
-                    "tipo": "sintáctico",  # Tipo de error
-                    "linea":0,  # Línea desconocida (puedes cambiarla si tienes acceso a la línea)
-                    "mensaje": str(e),  # Mensaje de error
-                }
-            )
-            print(f"❌ Error en el parser: {e}")
-
-        # Ejecutar el código si no hay errores sintácticos o semánticos
-        if not global_errors:
-            try:
-                # Aquí deberías generar el código Python a partir del código fuente
-                python_code = self.generate_python_code(
-                    code
-                )  # Implementa esta función si no está
-                execution_result = run_code(python_code)
-                if "Error de ejecución" in execution_result:
-                    # Agregar el error de ejecución con el formato estándar
-                    execution_errors.append(
-                        {
-                            "tipo": "ejecución",
-                            "linea": "desconocida",
-                            "mensaje": execution_result,
-                        }
-                    )
-            except Exception as e:
-                # Agregar el error de ejecución con el formato estándar
-                execution_errors.append(
-                    {
-                        "tipo": "ejecución",
-                        "linea": "desconocida",
-                        "mensaje": f"Error de ejecución: {str(e)}",
-                    }
-                )
-        # Verificar si global_errors tiene contenido
-        print(f"\n📌 Contenido de global_errors antes de verificar:\n{global_errors}")
-        print(f"📌 Contenido de execution_errors antes de verificar: {execution_errors}")
-
-        # Verificar si hay errores en la lista global
-        if global_errors or execution_errors:
-            print("\n❌ Errores encontrados durante el análisis:\n")
+            ast = parser.parse(code, lexer=lexer, tracking=True)
             
-            # Agregar los errores a la tabla de la interfaz gráfica
-            for error in global_errors + execution_errors:
-                if isinstance(error, dict) and "mensaje" in error:
-                    self.error_list.insert("", tk.END, values=(error["mensaje"],))  # Agregar error a la tabla
-                    print(f"✅ Error agregado a la tabla: {error['mensaje']}")  # Depuración en consola
-                else:
-                    print(f"⚠️ Error con formato incorrecto: {error}")
+            # Depuración: imprimir estructura cruda del AST
+            # print("\n🔥 Estructura cruda del AST:")
+            # from pprint import pprint
+            # pprint(vars(ast))
+            # for decl in ast.declaraciones:
+            #     pprint(vars(decl))
+            #     if hasattr(decl, 'cuerpo'):
+            #         print("Contenido del cuerpo:", decl.cuerpo)
+            
+            # Después de parser.parse()
+            if isinstance(ast, NodoPrograma):
+                print("AST construido correctamente")
+                # for decl in ast.declaraciones:
+                #     print(f"Declaración en línea {decl.linea}")
+            else:
+                print("Error: No se generó un NodoPrograma válido")
+            
+            print("✔️ Análisis sintáctico completado.")
+                    # Verificar que se obtuvo un AST válido
+            if not isinstance(ast, NodoPrograma):
+                global_errors.append({
+                    "tipo": "sintáctico",
+                    "linea": 0,
+                    "mensaje": "El programa no pudo ser analizado correctamente"
+                })
+        except Exception as e:
+            global_errors.append({
+                "tipo": "sintáctico",
+                "linea": 0,
+                "mensaje": f"Error de sintaxis: {str(e)}"
+            }) 
+        
+        # Si hay errores sintácticos, detenerse aquí
+        if global_errors:
+            self._mostrar_errores()
+            return
+        
+        # --------------------------------------------
+        # 3. Análisis Semántico
+        # --------------------------------------------
+        
+        try:
+            analyzer = SemanticAnalyzer()
+            analyzer.analyze(ast)
+            print("✔️ Análisis semántico completado.")
+        except Exception as e:
+            global_errors.append({
+                "tipo": "semántico",
+                "linea": 0,
+                "mensaje": f"Error semántico: {str(e)}" 
+            })
 
-            # Actualizar la tabla para reflejar los cambios
-            self.error_list.update_idletasks()
+        # Si hay errores semánticos, detenerse aquí
+        if global_errors:
+            self._mostrar_errores()
+            return
+            
+        # --------------------------------------------
+        # 4. Generación de Código y Ejecución (si no hay errores)
+        # --------------------------------------------
+        execution_errors = []
+        try:
+            python_code = self.generate_python_code(code)
+            execution_result = run_code(python_code)
+            if "Error de ejecución" in execution_result:
+                execution_errors.append({
+                    "tipo": "ejecución",
+                    "linea": "desconocida",
+                    "mensaje": execution_result
+                })
+        except Exception as e:
+            execution_errors.append({
+                "tipo": "ejecución",
+                "linea": "desconocida",
+                "mensaje": f"Error de ejecución: {str(e)}"
+            })
+
+        # Mostrar todos los errores (si los hay)
+        if global_errors or execution_errors:
+            self._mostrar_errores(execution_errors)
         else:
             print("✔️ No se encontraron errores durante el análisis.")
+            self.mostrar_en_consola("✅ Programa ejecutado correctamente.")
 
-        # Resaltar líneas con errores
-        for error in global_errors:
-            if "linea" in error and isinstance(error["linea"], int):
-                self.highlight_error_line(error["linea"])
+    def _mostrar_errores(self, execution_errors=None):
+        """Muestra los errores clasificados por tipo"""
+        # Crear secciones para cada tipo de error
+        error_types = {
+            "léxico": "Errores Léxicos",
+            "sintáctico": "Errores Sintácticos",
+            "semántico": "Errores Semánticos",
+            "ejecución": "Errores de Ejecución"
+        }
+        
+        # Agrupar errores por tipo
+        grouped_errors = {k: [] for k in error_types}
+        for error in global_errors + (execution_errors if execution_errors else []):
+            if isinstance(error, dict) and "tipo" in error and error["tipo"] in error_types:
+                grouped_errors[error["tipo"]].append(error)
+        
+        # Mostrar en la tabla
+        for error_type, title in error_types.items():
+            if grouped_errors[error_type]:
+                # Agregar encabezado
+                self.error_list.insert("", tk.END, values=(f"===== {title} =====",))
+                
+                # Agregar errores
+                for error in grouped_errors[error_type]:
+                    line_info = f"Línea {error['linea']}: " if "linea" in error and isinstance(error["linea"], int) else ""
+                    self.error_list.insert("", tk.END, values=(f"  {line_info}{error['mensaje']}",))
+        
+        self.error_list.update_idletasks()
         print("🚀 Análisis finalizado.\n")
-
+    def print_ast(self, node, level=0):
+        """Muestra el AST en la consola para depuración"""
+        indent = "  " * level
+        node_info = f"{indent}{type(node).__name__}"
+        
+        if hasattr(node, 'linea'):
+            node_info += f" (línea {node.linea})"
+        
+        self.mostrar_en_consola(node_info)
+        
+        # Recorrer hijos del nodo
+        if isinstance(node, NodoPrograma):
+            for decl in node.declaraciones:
+                self.print_ast(decl, level + 1)
+        elif isinstance(node, NodoIf):
+            self.mostrar_en_consola(f"{indent}  Condición:")
+            self.print_ast(node.condicion, level + 2)
+            self.mostrar_en_consola(f"{indent}  Cuerpo IF:")
+            for stmt in node.cuerpo_if:
+                self.print_ast(stmt, level + 2)
+            if node.cuerpo_else:
+                self.mostrar_en_consola(f"{indent}  Cuerpo ELSE:")
+                for stmt in node.cuerpo_else:
+                    self.print_ast(stmt, level + 2)
+        elif isinstance(node, NodoMientras):
+            self.mostrar_en_consola(f"{indent}  Condición:")
+            self.print_ast(node.condicion, level + 2)
+            self.mostrar_en_consola(f"{indent}  Cuerpo:")
+            for stmt in node.cuerpo:
+                self.print_ast(stmt, level + 2)
+        elif isinstance(node, NodoPara):
+            self.mostrar_en_consola(f"{indent}  Variable: {node.variable}")
+            self.mostrar_en_consola(f"{indent}  Desde:")
+            self.print_ast(node.inicio, level + 2)
+            self.mostrar_en_consola(f"{indent}  Hasta:")
+            self.print_ast(node.fin, level + 2)
+            if node.paso:
+                self.mostrar_en_consola(f"{indent}  Paso:")
+                self.print_ast(node.paso, level + 2)
+            self.mostrar_en_consola(f"{indent}  Cuerpo:")
+            for stmt in node.cuerpo:
+                self.print_ast(stmt, level + 2)
+        elif isinstance(node, NodoRepetir):
+            self.mostrar_en_consola(f"{indent}  Cuerpo:")
+            for stmt in node.cuerpo:
+                self.print_ast(stmt, level + 2)
+            self.mostrar_en_consola(f"{indent}  Condición:")
+            self.print_ast(node.condicion, level + 2)
+        elif isinstance(node, NodoMostrar):
+            self.mostrar_en_consola(f"{indent}  Expresiones:")
+            for expr in node.expresiones:
+                self.print_ast(expr, level + 2)
+        elif isinstance(node, (NodoBinario, NodoUnario)):
+            # No es necesario recorrer hijos aquí, ya se muestran en el nodo principal
+            pass
+        elif isinstance(node, (NodoIdentificador, NodoLiteral)):
+            # Nodos hoja, no requieren recorrido adicional
+            pass
+        
     def auto_indent(self, event=None):
         """Agrega tabulación automática al presionar Enter"""
         cursor_index = self.text_area.index(tk.INSERT)

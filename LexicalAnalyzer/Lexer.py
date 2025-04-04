@@ -5,6 +5,7 @@ from GlobalErrors.ErrorsManager import global_errors
 # ------------------------ Definición de Tokens ------------------------
 
 reserved = {
+    "constante": "CONSTANTE",
     "inicio": "INICIO",
     "fin": "FIN",
     "si": "SI",

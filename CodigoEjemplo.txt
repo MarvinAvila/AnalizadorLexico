@@ -1,0 +1,55 @@
+inicio
+    // Declaración de variables
+    entero a = 10;
+    entero b = 5;
+    decimal c;
+    decimal d = 2.5;
+    cadena mensaje = "Resultado: ";
+    booleano condicion = verdadero;
+    entero i = 0 ;
+
+    // Asignación y operaciones aritméticas
+    c = a + b;
+    mostrar mensaje, "Suma: ", c;
+
+    c = a - b;
+    mostrar mensaje, "Resta: ", c;
+
+    c = a * b;
+    mostrar mensaje, "Multiplicación: ", c;
+
+    c = a / b;
+    mostrar mensaje, "División: ", c;
+
+    // Estructura de control SI
+    si (a > b) entonces
+        mostrar "a es mayor que b";
+    sino
+        mostrar "a no es mayor que b";
+    fin_si
+
+    // Estructura de control MIENTRAS
+    mientras (condicion) hacer
+        mostrar "Condición es verdadera";
+        condicion = falso; // Cambiamos la condición para salir del bucle
+    fin_mientras
+
+    // Estructura de control PARA
+    para  i desde 1 hasta 5 hacer
+        mostrar "Iteración: ", i;
+    fin_para
+
+    // Estructura de control REPETIR
+    repetir
+        mostrar "Esto se ejecuta al menos una vez";
+    hasta_que (condicion); // La condición es falsa, por lo que solo se ejecuta una vez
+
+    // Uso de constantes
+    constante MAXIMO = 100;
+    mostrar "El valor máximo es: ", MAXIMO;
+
+    // Operaciones con cadenas
+    cadena saludo = "Hola, ";
+    cadena nombre = "Mundo";
+    mostrar saludo , nombre;
+fin

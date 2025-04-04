@@ -1,6 +1,11 @@
 import ply.yacc as yacc
 from LexicalAnalyzer.Lexer import tokens
 from GlobalErrors.ErrorsManager import global_errors
+from SyntaxAnalyzer.AST import Nodo,NodoIf,NodoAsignacion,NodoDeclaracion,NodoBinario,NodoIdentificador,NodoLiteral,NodoMientras,NodoMostrar,NodoRepetir,NodoPara,NodoUnario,NodoPrograma
+from SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
+
+
+semantic_analyzer = SemanticAnalyzer()
 
 # Definir precedencia para resolver conflictos
 precedence = (
@@ -33,29 +38,39 @@ if not isinstance(global_errors, list):
 variables = {}  
 constantes = {} 
 
+
+# Modifica la función p_programa:
 def p_programa(p):
     """programa : INICIO declaraciones FIN"""
-    print(
-        "📌 Entrando en `p_programa()`, procesando declaraciones entre `inicio` y `fin`..."
-    )
-    print(f"📄 Tokens recibidos: INICIO={p[1]}, FIN={p[3]}")  
-    p[0] = p[2] if p[2] else []  
+    program_node = NodoPrograma(declaraciones=p[2], linea=p.lineno(1))
+    
+    # Realizar análisis semántico
+    semantic_analyzer.analyze(program_node)
+    
+    p[0] = program_node
 
 def p_declaraciones(p):
-    """declaraciones : declaraciones declaracion_simple
-    | declaraciones declaracion_con_asignacion
-    | declaraciones constante
-    | declaraciones asignacion
-    | declaraciones sentencia_if
-    | declaraciones sentencia_mientras
-    | declaraciones sentencia_para
-    | declaraciones sentencia_repetir
-    | declaraciones sentencia_mostrar
-    | empty"""
+    """declaraciones : declaraciones declaracion
+                    | declaracion"""
     if len(p) == 3:
         p[0] = p[1] + [p[2]]  
     else:
-        p[0] = [p[1]] if p[1] else []
+        p[0] = [p[1]] 
+
+def p_declaracion(p):
+    """declaracion : declaracion_simple
+                | declaracion_con_asignacion
+                | asignacion
+                | constante
+                | sentencia_if
+                | sentencia_mientras
+                | sentencia_para
+                | sentencia_repetir
+                | sentencia_mostrar
+                | empty"""
+    
+    p[0]=p[1]
+
 
 def p_empty(p):
     "empty :"
@@ -65,94 +80,82 @@ def normalizar_tipo(tipo):
     """Normaliza un tipo de dato a su formato estándar (minúsculas)."""
     return TIPOS_DE_DATOS.get(tipo.upper(), tipo.lower())
 
-# Reglas para estructuras de control
 def p_sentencia_if(p):
     """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
-    | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
-    # if len(p) < 7 or p[5] != 'ENTONCES':
-    #     error_msg = f"Error de sintaxis: Se esperaba 'ENTONCES' después de la condición en la línea {p.lineno(1)}"
-    #     global_errors.append({
-    #         "tipo": "sintáctico",
-    #         "linea": p.lineno(1),
-    #         "mensaje": error_msg
-    #     })
-    #     return
-    tipo_condicion, valor_condicion = p[3]
-    if normalizar_tipo(tipo_condicion) != "booleano": 
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(3),  # Línea donde está la condición
-            "mensaje": f"La condición del 'si' debe ser booleana, pero se encontró {tipo_condicion}"
-        })
-    if len(p) == 6:  
-        print(f"📌 Sentencia IF detectada: condición={valor_condicion}")
-    else:  
-        print(f"📌 Sentencia IF-ELSE detectada: condición={valor_condicion}")
+                   | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
+    # Generar NodoIf(condicion, cuerpo_if, cuerpo_else, linea)
+    p[0] = NodoIf(
+        condicion=p[3], 
+        cuerpo_if=p[6], 
+        cuerpo_else=p[8] if len(p) > 7 else None, 
+        linea=p.lineno(1)
+    )
 
 def p_sentencia_mientras(p):
     """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
-    tipo_condicion, valor_condicion = p[3]  
-    if normalizar_tipo(tipo_condicion) != "booleano":
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(3),  # Línea donde está la condición
-            "mensaje": f"La condición del 'mientras' debe ser booleana, pero se encontró {tipo_condicion}"
-        })
-    print(f"📌 Sentencia MIENTRAS detectada: condición={valor_condicion}")
+    # Generar NodoWhile(condicion, cuerpo, linea)
+    p[0] = NodoMientras(
+        condicion=p[3], 
+        cuerpo=p[6], 
+        linea=p.lineno(1)
+    )
 
 def p_sentencia_para(p):
     """sentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones FIN_PARA
                      | PARA IDENTIFICADOR DESDE expresion HASTA expresion CON_PASO expresion HACER declaraciones FIN_PARA"""
-    nombre_variable = p[2]  # Nombre de la variable de iteración (i)
-    desde_tipo, desde_valor = p[4]  # Expresión DESDE
-    hasta_tipo, hasta_valor = p[6]  # Expresión HASTA
+    var_node = NodoIdentificador(nombre=p[2], linea=p.lineno(2))
+    
+    if len(p) == 10:  # Sin paso
+        cuerpo = p[8]
+        paso = None
+    else:  # Con paso
+        cuerpo = p[10]
+        paso = p[8]
+    
+    p[0] = NodoPara(
+        variable=var_node,
+        inicio=p[4],
+        fin=p[6],
+        paso=paso,
+        cuerpo=cuerpo,  # Asegurar que sea lista de declaraciones
+        linea=p.lineno(1)
+    )
 
-    # Verificar que la variable de iteración ya esté declarada
-    if nombre_variable not in variables:
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(2),  # Línea donde está el identificador
-            "mensaje": f"La variable de iteración '{nombre_variable}' no ha sido declarada"
-        })
+def p_instrucciones_para(p):
+    """instrucciones_para : instruccion_para
+                         | instrucciones_para instruccion_para"""
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1] + [p[2]]
 
-    # Verificar que las expresiones DESDE y HASTA sean ENTERO
-    if desde_tipo != "entero" or hasta_tipo != "entero":
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(4),  # Línea donde está la expresión DESDE
-            "mensaje": f"Las expresiones DESDE y HASTA deben ser de tipo ENTERO"
-        })
-
-    # Manejar el caso con paso
-    if len(p) == 11:  # PARA con paso
-        paso_tipo, paso_valor = p[8]  # Expresión CON_PASO
-        if paso_tipo != "entero":
-            global_errors.append({
-                "tipo": "semántico",
-                "linea": p.lineno(8),  # Línea donde está la expresión CON_PASO
-                "mensaje": f"El paso debe ser de tipo ENTERO"
-            })
-        print(f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}, paso={paso_valor}")
-    else:  # PARA sin paso
-        print(f"📌 Sentencia PARA detectada: variable={nombre_variable}, desde={desde_valor}, hasta={hasta_valor}")
+# Instrucciones específicas para PARA
+def p_instruccion_para(p):
+    """instruccion_para : sentencia_mostrar
+                       | asignacion
+                       | sentencia_if
+                       | sentencia_mientras"""
+    p[0] = p[1]
+    
 
 def p_sentencia_repetir(p):
     """sentencia_repetir : REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
-    tipo_condicion, valor_condicion = p[5]  # La condición está en p[5]
-    if normalizar_tipo(tipo_condicion) != "booleano":
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(5),  # Línea donde está la condición
-            "mensaje": f"La condición del 'repetir' debe ser booleana, pero se encontró {tipo_condicion}"
-        })
-    print(f"📌 Sentencia REPETIR detectada: condición={valor_condicion}")
+    p[0] = NodoRepetir(
+        cuerpo=p[2],          # Lista de nodos (declaraciones dentro del REPETIR)
+        condicion=p[5],       # Nodo de la expresión (condición del HASTA_QUE)
+        linea=p.lineno(1)     # Línea donde empieza la sentencia
+    )
+    print(f"📌 Sentencia REPETIR convertida a AST en línea {p.lineno(1)}")
 
 def p_sentencia_mostrar(p):
-    '''sentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMA'''
-    mensaje = " ".join(str(exp[1]) for exp in p[2])  # Concatenar todas las expresiones
-    print(f"📢 Mostrando: {mensaje}")
-    if parser.mostrar_en_consola: 
-        parser.mostrar_en_consola(f"📢 Mostrando: {mensaje}")
+    """sentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMA"""
+    if not p[2]:  # Si lista_expresiones está vacía
+        raise SyntaxError("La sentencia 'mostrar' debe incluir expresiones", p.lineno(1))
+    
+    p[0] = NodoMostrar(
+        expresiones=p[2],
+        linea=p.lineno(1)
+    )
 
 def p_expresion(p):
     """expresion : LITERAL_ENTERO
@@ -175,220 +178,92 @@ def p_expresion(p):
                  | expresion DIFERENTE expresion
                  | PARENTESIS_IZQ expresion PARENTESIS_DER"""
     
-    print(f"📌 Procesando expresión: {p[:]}") 
+    # --- Caso 1: Literales o identificadores ---
+    if len(p) == 2:
+        if isinstance(p[1], tuple):  # Literal (ej: ("entero", 42))
+            tipo, valor = p[1]
+            p[0] = NodoLiteral(tipo=normalizar_tipo(tipo), valor=valor, linea=p.lineno(1))
+        elif isinstance(p[1], str):  # Identificador (ej: "x")
+            p[0] = NodoIdentificador(nombre=p[1], linea=p.lineno(1))
+        else:
+            raise SyntaxError(f"Tipo de expresión no reconocido: {type(p[1])}")
 
-    if len(p) == 2:  # 📌 Caso: Literales o identificadores
-        if isinstance(p[1], tuple):  # Extraer tipo y valor de un literal
-            tipo_valor, valor = p[1]
-            p[0] = (normalizar_tipo(tipo_valor), valor)
-
-        elif isinstance(p[1], str):  # 📌 Caso: Identificadores (variables o constantes)
-            if p[1] in variables:
-                tipo_variable, valor_variable = variables[p[1]]
-
-                # 🚨 Si la variable es inválida, generar un error y detener la evaluación
-                if valor_variable is None:
-                    global_errors.append({
-                        "tipo": "semántico",
-                        "linea": p.lineno(1),  # Línea donde está el identificador
-                        "mensaje": f"La variable '{p[1]}' es inválida y no puede usarse en expresiones."
-                    })
-                    print(f"🚨 Error semántico: Uso de variable inválida ({p[1]}) en expresión.")
-                    p[0] = ("error", None)
-                    return
-
-                p[0] = (normalizar_tipo(tipo_variable), valor_variable)
-
-            elif p[1] in constantes:
-                tipo_constante, valor_constante = constantes[p[1]]
-                p[0] = (normalizar_tipo(tipo_constante), valor_constante)
-            else:
-                global_errors.append({
-                    "tipo": "semántico",
-                    "linea": p.lineno(1),  # Línea donde está el identificador
-                    "mensaje": f"Variable '{p[1]}' no definida."
-                })
-                p[0] = ("error", None)  # Evitar acceso a None
-
-    elif len(p) == 4 and p[1] == '(' and p[3] == ')':  # 📌 Caso: Expresión entre paréntesis
+    # --- Caso 2: Expresión entre paréntesis ---
+    elif len(p) == 4 and p[1] == '(' and p[3] == ')':
         p[0] = p[2]
 
-    else:  # 📌 Caso: Operaciones aritméticas, lógicas o de comparación
-        tipo1, val1 = p[1] if isinstance(p[1], tuple) else ("error", None)
-        tipo2, val2 = p[3] if isinstance(p[3], tuple) else ("error", None)
-
-        # 🚨 Si alguno de los operandos es inválido, generar un error y detener la evaluación
-        if val1 is None or val2 is None:
-            global_errors.append({
-                "tipo": "semántico",
-                "linea": p.lineno(2),  # Línea donde está la operación
-                "mensaje": f"Error en la operación '{p[2]}': Un operando es inválido."
-            })
-            print(f"🚨 Error semántico: Intento de operar con valores inválidos ({p[1]} {p[2]} {p[3]}).")
-            p[0] = ("error", None)
-            return
-
-        try:
-            if p[2] == '+':
-                p[0] = ("entero", val1 + val2)
-            elif p[2] == '-':
-                p[0] = ("entero", val1 - val2)
-            elif p[2] == '*':
-                p[0] = ("entero", val1 * val2)
-            elif p[2] == '/':
-                p[0] = ("decimal", val1 / val2 if val2 != 0 else 0)  # Evitar división por cero
-            elif p[2] == 'AND':
-                p[0] = ("booleano", val1 and val2)
-            elif p[2] == 'OR':
-                p[0] = ("booleano", val1 or val2)
-            elif p[1] == 'NOT':
-                p[0] = ("booleano", not val1)
-            elif p[2] == '>':
-                p[0] = ("booleano", val1 > val2)
-            elif p[2] == '<':
-                p[0] = ("booleano", val1 < val2)
-            elif p[2] == '>=':
-                p[0] = ("booleano", val1 >= val2)
-            elif p[2] == '<=':
-                p[0] = ("booleano", val1 <= val2)
-            elif p[2] == '==':
-                p[0] = ("booleano", val1 == val2)
-            elif p[2] == '!=':
-                p[0] = ("booleano", val1 != val2)
-        except Exception as e:
-            global_errors.append({
-                "tipo": "semántico",
-                "linea": p.lineno(2),  # Línea donde está la operación
-                "mensaje": f"Error en la operación '{p[2]}': {str(e)}"
-            })
-            p[0] = ("error", None)
-
+    # --- Caso 3: Operaciones binarias/unarias ---
+    else:
+        if p[1] == 'NOT':
+            if not isinstance(p[2], Nodo):
+                raise SyntaxError(f"Operando de NOT debe ser expresión válida")
+            p[0] = NodoUnario(operador="NOT", expresion=p[2], linea=p.lineno(1))
+        else:
+            if not isinstance(p[1], Nodo) or not isinstance(p[3], Nodo):
+                raise SyntaxError(f"Operandos deben ser expresiones válidas")
+            p[0] = NodoBinario(
+                operador=p[2],
+                izquierda=p[1],
+                derecha=p[3],
+                linea=p.lineno(2)
+            )
 
 def p_lista_expresiones(p):
     '''lista_expresiones : lista_expresiones COMA expresion
                          | expresion'''
-    if len(p) == 4:  # Si hay una lista de expresiones
-        p[0] = p[1] + [p[3]]  # Agregar la nueva expresión a la lista
-    else:  # Si es una sola expresión
-        p[0] = [p[1]]  # Crear una lista con una sola expresión
+    if len(p) == 4:
+        if not isinstance(p[1], list):
+            p[1] = [p[1]]  # Convertir a lista si no lo es
+        p[0] = p[1] + [p[3]]
+    else:
+        # Asegurar que siempre devolvemos una lista de nodos
+        p[0] = [p[1]] if isinstance(p[1], Nodo) else []
+
 
 def p_declaracion_simple(p):
     """declaracion_simple : TIPO IDENTIFICADOR PUNTO_COMA"""
-    print(f"➡️ Entrando a `p_declaracion_simple()`, Tokens: {p[:]}")
-    tipo_variable = p[1]
-    nombre_variable = p[2]
-
-    # Asignar un valor por defecto dependiendo del tipo
-    if tipo_variable == "entero":
-        valor_inicial = 0
-    elif tipo_variable == "decimal":
-        valor_inicial = 0.0
-    elif tipo_variable == "cadena":
-        valor_inicial = ""
-    elif tipo_variable == "booleano":
-        valor_inicial = False
-    else:
-        valor_inicial = None  # Para tipos no reconocidos
-
-    variables[nombre_variable] = (tipo_variable, valor_inicial)
-    print(
-        f"✔️ Declaración válida: {nombre_variable} es de tipo {tipo_variable} (valor inicial: {valor_inicial})"
+    # Generar NodoDeclaracion(tipo, identificador, valor=None, linea)
+    p[0] = NodoDeclaracion(
+        tipo=p[1], 
+        identificador=NodoIdentificador(nombre=p[2], linea=p.lineno(2)), 
+        expresion=None, 
+        linea=p.lineno(2)
     )
 
 def p_declaracion_con_asignacion(p):
     """declaracion_con_asignacion : TIPO IDENTIFICADOR ASIGNACION expresion PUNTO_COMA"""
-    print(f"➡️ Entrando a `p_declaracion_con_asignacion()`, Tokens: {p[:]}")
-    tipo_variable = p[1]
-    nombre_variable = p[2]
-    tipo_valor, valor = p[4]  # La expresión ya fue procesada por la regla `expresion`
-    
-    print(f"📌 Variable detectada: {nombre_variable} ({tipo_variable}) = {valor} ({tipo_valor})")
-    if nombre_variable in variables:
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(2),  # Línea donde está el identificador
-            "mensaje": f"La variable '{nombre_variable}' ya ha sido declarada."
-        })
-        return
-    
-    if not es_tipo_valido(tipo_variable, tipo_valor):
-        error_msg = f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})"
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(2),  # Línea donde está el identificador
-            "mensaje": error_msg
-        })
-        print(f"❌ Error semántico: {error_msg}")
-        
-        variables[nombre_variable] = (tipo_variable, None)  # `None` indica que la variable es inválida
-        return
-    else:
-        variables[nombre_variable] = (tipo_variable, valor)
-        print(f"✔️ Declaración válida: {nombre_variable} = {valor}")
+    # Generar NodoDeclaracion(tipo, identificador, expresion, linea)
+    p[0] = NodoDeclaracion(
+        tipo=p[1], 
+        identificador=NodoIdentificador(nombre=p[2], linea=p.lineno(2)), 
+        expresion=p[4], 
+        linea=p.lineno(2)
+    )
 
 def p_asignacion(p):
     """asignacion : IDENTIFICADOR ASIGNACION expresion PUNTO_COMA"""
-    print(f"➡️ Entrando a `p_asignacion()`, Tokens: {p[:]}")
+    # Verificar que el identificador sea un string, no un nodo
+    if isinstance(p[1], str):
+        ident = NodoIdentificador(nombre=p[1], linea=p.lineno(1))
+    else:
+        # Manejar caso donde ya es un nodo (por si acaso)
+        ident = p[1]
     
-    nombre_variable = p[1]
-    if nombre_variable not in variables:
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(1),  # Línea donde está el identificador
-            "mensaje": f"La variable '{nombre_variable}' no ha sido declarada."
-        })
-        return
-    
-    tipo_variable, valor_actual = variables[nombre_variable]  # Obtener el tipo y valor actual
-    tipo_valor, valor = p[3]
-    
-    print(f"📌 Asignación detectada: {nombre_variable} = {valor} ({tipo_valor})")
-    
-    # Si la variable ya es inválida, evitar su uso
-    if valor_actual is None:
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(1),  # Línea donde está el identificador
-            "mensaje": f"No se puede asignar a '{nombre_variable}' porque tiene un valor inválido debido a un error previo."
-        })
-        print(f"🚨 Error: Intento de usar una variable inválida ({nombre_variable}).")
-        return
-
-    # Si la asignación no es válida, marcar la variable como inválida
-    if not es_tipo_valido(tipo_variable, tipo_valor):
-        error_msg = f"No se puede asignar '{valor}' (tipo {tipo_valor}) a '{nombre_variable}' (tipo {tipo_variable})"
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(1),  # Línea donde está el identificador
-            "mensaje": error_msg
-        })
-        variables[nombre_variable] = (tipo_variable, None)  # 🚨 Marcar la variable como inválida
-        print(f" Error semántico: {nombre_variable} es inválida después de esta asignación.")
-        return
-
-    # Si la asignación es válida, actualizar el valor
-    variables[nombre_variable] = (tipo_variable, valor)
-    print(f"✔️ Asignación válida: {nombre_variable} = {valor}")
+    p[0] = NodoAsignacion(
+        identificador=ident,
+        expresion=p[3],
+        linea=p.lineno(1)
+    )
 
 def p_constante(p):
-    """constante : TIPO IDENTIFICADOR ASIGNACION expresion"""
-    tipo_variable = p[1].lower()  # Convertir a minúsculas
-    nombre_variable = p[2]
-    tipo_valor, valor = p[4]
-    if nombre_variable in constantes:
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(2),  # Línea donde está el identificador
-            "mensaje": f"La constante '{nombre_variable}' ya fue declarada"
-        })
-    if not es_tipo_valido(tipo_variable, tipo_valor):
-        global_errors.append({
-            "tipo": "semántico",
-            "linea": p.lineno(4),  # Línea donde está la expresión
-            "mensaje": f"No se puede asignar '{valor}' (tipo {tipo_valor}) a la constante '{nombre_variable}' (tipo {tipo_variable})"
-        })
-    constantes[nombre_variable] = (tipo_variable, valor)
-    print(f"✔️ Constante válida: {nombre_variable} = {valor} ({tipo_variable})")
+    """constante : CONSTANTE IDENTIFICADOR ASIGNACION expresion PUNTO_COMA"""  
+    p[0] = NodoDeclaracion(
+        tipo='constante',
+        identificador=NodoIdentificador(nombre=p[2], linea=p.lineno(2)),
+        expresion=p[4],
+        linea=p.lineno(2),
+        es_constante=True  # Marcar explícitamente como constante
+    )
 
 def es_tipo_valido(tipo_variable, tipo_valor):
     """Verifica si el tipo del valor es compatible con el tipo de la variable."""
@@ -417,15 +292,19 @@ def es_tipo_valido(tipo_variable, tipo_valor):
 def p_error(p):
     """Manejo de errores de sintaxis sin interrumpir el análisis."""
     if p:
-        print(f"🔴 Error en línea detectada por PLY: {p.lineno}")  # Depuración
-        error_msg = f"❌ Error de sintaxis en línea {p.lineno}: Token inesperado '{p.value}'"
+        # Manejar caso específico de NodoIdentificador mal formado
+        if hasattr(p, 'value') and isinstance(p.value, NodoIdentificador):
+            error_msg = f"Error de sintaxis en línea {p.lineno}: Identificador '{p.value.nombre}' mal formado"
+        else:
+            error_msg = f"Error de sintaxis en línea {p.lineno}: Token inesperado '{p.value}'"
+        
         global_errors.append({
             "tipo": "sintáctico",
             "linea": p.lineno,
             "mensaje": error_msg
         })
     else:
-        error_msg = "❌ Error de sintaxis: Fin de archivo inesperado"
+        error_msg = "Error de sintaxis: Fin de archivo inesperado"
         global_errors.append({
             "tipo": "sintáctico",
             "linea": 0,
