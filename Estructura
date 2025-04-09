@@ -1,0 +1,25 @@
+CompiladorPSeInt/
+├── GlobalErrors/
+│   └── ErrorsManager.py
+│
+├── CodeGenerator/
+│   ├── Optimizer.py
+│   ├── Translator.py
+│   └── TACGenerator.py
+│
+├── Executor/
+│   ├── Runner.py
+│
+├── LexicalAnalyzer/
+│   └── Lexer.py
+│
+├── SyntaxAnalyzer/
+│   ├── Parser.py
+│   ├── AST.py
+│   └── parsetab.py
+│
+├── SemanticAnalyzer/
+│   └── SemanticAnalyzer.py
+│
+└── UI/
+    └── Main.py

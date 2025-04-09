@@ -42,7 +42,8 @@ inicio
     // Estructura de control REPETIR
     repetir
         mostrar "Esto se ejecuta al menos una vez";
-    hasta_que (condicion); // La condición es falsa, por lo que solo se ejecuta una vez
+        condicion = verdadero;
+    hasta_que (condicion); // La condición es verdadera, por lo que solo se ejecuta una vez
 
     // Uso de constantes
     constante MAXIMO = 100;

@@ -13,6 +13,9 @@ from LexicalAnalyzer.Lexer import reserved
 from Executor.Runner import run_code
 from SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
 from SyntaxAnalyzer.AST import NodoPrograma, NodoIf, NodoMientras, NodoPara, NodoRepetir, NodoMostrar, NodoBinario, NodoUnario, NodoIdentificador, NodoLiteral
+from CodeGenerator.TACGenerator import TACGenerator
+from CodeGenerator.Translator import Translator
+from CodeGenerator.Optimizer import Optimizer
 
 
 class CompilerApp:
@@ -76,6 +79,8 @@ class CompilerApp:
         self.error_list.heading("Error", text="Errores")
         self.error_list.column("Error", width=350, anchor="w")
         self.error_list.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        self.add_copy_functionality()
 
         # Consola de salida
         self.console = scrolledtext.ScrolledText(
@@ -221,19 +226,14 @@ class CompilerApp:
     def mostrar_en_consola(self, mensaje):
         """Muestra un mensaje en la consola de salida."""
         self.console.config(state=tk.NORMAL)
-        self.console.insert(tk.END, mensaje + "\n")
+        self.console.insert(tk.END, str(mensaje))  # Convertir a string por seguridad
+        self.console.insert(tk.END, "\n")  # Añadir salto de línea
+        self.console.see(tk.END)  # Auto-desplazamiento al final
         self.console.config(state=tk.DISABLED)
+        self.console.update_idletasks()  # Forzar actualización de la GUI
 
     def analyze_code(self):
         print("\n🚀 Iniciando análisis de código...")
-        
-        # FORZAR UN ERROR PARA VERIFICAR QUE LA TABLA FUNCIONA
-        global_errors.append({
-            "tipo": "prueba",
-            "linea": 0,
-            "mensaje": "Este es un error de prueba para la tabla"
-        })
-
 
         # 🔹 Limpiar la consola antes de cada análisis
         self.console.config(state=tk.NORMAL)
@@ -246,9 +246,12 @@ class CompilerApp:
         self.text_area.tag_remove("error", "1.0", tk.END)
 
 
-        from LexicalAnalyzer.Lexer import lexer
+        # Limpiar estados globales
+        from GlobalErrors.ErrorsManager import global_errors
+        global_errors.clear()
         
-        global_errors.clear()  # Limpiar errores globales antes de cada análisis
+        from LexicalAnalyzer.Lexer import lexer
+        lexer.lineno = 1  
 
         # 🔹 LIMPIAR LAS VARIABLES Y CONSTANTES PREVIAS
         variables.clear()
@@ -346,31 +349,203 @@ class CompilerApp:
             return
             
         # --------------------------------------------
-        # 4. Generación de Código y Ejecución (si no hay errores)
+        # 4. Generación de Código Intermedio (TAC)
         # --------------------------------------------
-        execution_errors = []
         try:
-            python_code = self.generate_python_code(code)
-            execution_result = run_code(python_code)
-            if "Error de ejecución" in execution_result:
+            tac_gen = TACGenerator()
+            tac_code = tac_gen.generate(ast)
+            
+            # Mostrar TAC original
+            self.mostrar_en_consola("\n🔷 Código Intermedio (TAC) - Antes de optimizar:")
+            for line in tac_code:
+                self.mostrar_en_consola(line)
+            
+            print("✔️ Generación de código intermedio completada.")
+        except Exception as e:
+            global_errors.append({
+                "tipo": "generación",
+                "linea": 0,
+                "mensaje": f"Error generando TAC: {str(e)}"
+            })
+            self._mostrar_errores()
+            return
+
+        # --------------------------------------------
+        # 5. Optimización del TAC
+        # --------------------------------------------
+        try:
+            optimizer = Optimizer()
+            optimized_tac = optimizer.optimize(tac_code)
+            
+            # Mostrar TAC optimizado
+            self.mostrar_en_consola("\n🔷 Código Intermedio (TAC) - Después de optimizar:")
+            for line in optimized_tac:
+                self.mostrar_en_consola(line)
+                
+            # Mostrar variables esenciales detectadas (para depuración)
+            self.mostrar_en_consola(f"\n🔍 Variables esenciales identificadas: {', '.join(optimizer.essential_vars)}")
+            
+            print("✔️ Optimización de código intermedio completada.")
+        except Exception as e:
+            self.mostrar_en_consola(f"⚠️ Advertencia: {str(e)}")
+            optimized_tac = tac_code  # Usar TAC no optimizado como fallback
+
+        # --------------------------------------------
+        # 6. Traducción a Python
+        # --------------------------------------------
+        try:
+            translator = Translator(optimized_tac)
+            python_code = translator.translate()
+            
+            # Validación de identación
+            self.validate_python_code(python_code)
+            
+            self.mostrar_en_consola("\n🐍 Código Python Generado:")
+            self.mostrar_en_consola(python_code)
+            
+            print("✔️ Traducción a Python completada.")
+        except Exception as e:
+            global_errors.append({
+                "tipo": "traducción",
+                "linea": 0,
+                "mensaje": f"Error traduciendo a Python: {str(e)}"
+            })
+            self._mostrar_errores()
+            return
+
+        # --------------------------------------------
+        # 7. Ejecución del Código
+        # --------------------------------------------
+        self.execute_python_code(python_code)
+        
+    def validate_python_code(self, code):
+        """Valida que el código Python generado sea correcto"""
+        lines = code.split('\n')
+        stack = []
+        
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            current_indent = len(line) - len(line.lstrip())
+            
+            # Para bloques que deben aumentar identación
+            if stripped.endswith(':'):
+                if i+1 < len(lines) and not lines[i+1].startswith(' ' * (current_indent + 4)):
+                    raise IndentationError(f"Falta identación después de ':' en línea {i}")
+                stack.append(current_indent)
+            
+            # Para bloques que deben reducir identación
+            elif stripped and current_indent < (stack[-1] if stack else 0):
+                if not any(stripped.startswith(kw) for kw in ['else', 'elif']):
+                    stack.pop()
+        
+        if stack:
+            raise IndentationError("Bloques sin cerrar correctamente")    
+    
+    def validate_python_indentation(self, code):
+        """Valida que el código Python tenga identación correcta"""
+        lines = code.split('\n')
+        indent_stack = []
+        
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            current_indent = len(line) - len(line.lstrip())
+            
+            # Para bloques que deben aumentar identación
+            if stripped.endswith(':'):
+                if i+1 < len(lines) and not lines[i+1].startswith(' ' * (current_indent + 4)):
+                    raise IndentationError(f"Falta identación después de ':' en línea {i}")
+                indent_stack.append(current_indent)
+            
+            # Para bloques que deben reducir identación
+            elif stripped and current_indent < (indent_stack[-1] if indent_stack else 0):
+                if not any(stripped.startswith(kw) for kw in ['else', 'elif', 'except', 'finally']):
+                    indent_stack.pop()
+        
+        if indent_stack:
+            raise IndentationError("Bloques sin cerrar correctamente")
+
+    def execute_python_code(self, python_code):
+        """Ejecuta el código Python generado con manejo seguro"""
+        execution_errors = []
+        old_stdout = sys.stdout
+        
+        try:
+            # Validar sintaxis primero
+            import ast
+            ast.parse(python_code)
+            
+            # Configurar entorno seguro
+            safe_env = {
+                '__builtins__': {
+                    'print': print,
+                    'range': range,
+                    'str': str,
+                    'int': int,
+                    'float': float,
+                    'bool': bool
+                },
+                'True': True,
+                'False': False
+            }
+            
+            # Redirigir salida
+            from io import StringIO
+            sys.stdout = mystdout = StringIO()
+            
+            # Ejecutar con timeout
+            from threading import Thread
+            from queue import Queue
+            
+            result_queue = Queue()
+            
+            def execute():
+                try:
+                    exec(python_code, safe_env)
+                    result_queue.put(("success", mystdout.getvalue()))
+                except Exception as e:
+                    result_queue.put(("error", str(e)))
+            
+            thread = Thread(target=execute)
+            thread.start()
+            thread.join(timeout=5)  # 5 segundos máximo
+            
+            if thread.is_alive():
+                thread.join(timeout=0)
                 execution_errors.append({
                     "tipo": "ejecución",
                     "linea": "desconocida",
-                    "mensaje": execution_result
+                    "mensaje": "Error: Tiempo de ejecución excedido (posible bucle infinito)"
                 })
+            else:
+                status, result = result_queue.get()
+                if status == "success":
+                    self.mostrar_en_consola("\n🚀 Resultados de la ejecución:")
+                    self.mostrar_en_consola(result)
+                else:
+                    execution_errors.append({
+                        "tipo": "ejecución",
+                        "linea": "desconocida",
+                        "mensaje": f"Error de ejecución: {result}"
+                    })
+                    
+        except SyntaxError as syn_err:
+            error_msg = f"Error de sintaxis en línea {syn_err.lineno}: {syn_err.msg}"
+            self.highlight_error_line(syn_err.lineno)
+            execution_errors.append({
+                "tipo": "ejecución",
+                "linea": syn_err.lineno,
+                "mensaje": error_msg
+            })
         except Exception as e:
             execution_errors.append({
                 "tipo": "ejecución",
                 "linea": "desconocida",
-                "mensaje": f"Error de ejecución: {str(e)}"
+                "mensaje": f"Error inesperado: {str(e)}"
             })
-
-        # Mostrar todos los errores (si los hay)
-        if global_errors or execution_errors:
-            self._mostrar_errores(execution_errors)
-        else:
-            print("✔️ No se encontraron errores durante el análisis.")
-            self.mostrar_en_consola("✅ Programa ejecutado correctamente.")
+        finally:
+            sys.stdout = old_stdout
+            if execution_errors:
+                self._mostrar_errores(execution_errors)
 
     def _mostrar_errores(self, execution_errors=None):
         """Muestra los errores clasificados por tipo"""
@@ -479,6 +654,77 @@ class CompilerApp:
     def run(self):
         self.root.mainloop()
 
+    def add_copy_functionality(self):
+        # Crear menú contextual para copiar
+        self.error_list.bind("<Button-3>", self.show_error_context_menu)
+        
+        # Crear menú contextual
+        self.error_context_menu = tk.Menu(self.root, tearoff=0)
+        self.error_context_menu.add_command(label="Copiar", command=self.copy_selected_errors)
+        
+        # Botón para copiar todos los errores
+        self.copy_all_button = tk.Button(
+            self.error_list.master, 
+            text="Copiar Todos los Errores", 
+            command=self.copy_all_errors
+        )
+        self.copy_all_button.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def show_error_context_menu(self, event):
+        """Muestra el menú contextual para copiar errores"""
+        try:
+            self.error_context_menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.error_context_menu.grab_release()
+
+    def copy_selected_errors(self):
+        """Copia los errores seleccionados al portapapeles"""
+        selected_items = self.error_list.selection()
+        if not selected_items:
+            return
+            
+        error_text = ""
+        for item in selected_items:
+            error_values = self.error_list.item(item, "values")
+            if error_values:
+                error_text += error_values[0] + "\n"
+        
+        if error_text:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(error_text.strip())
+
+    def copy_all_errors(self):
+        """Copia todos los errores al portapapeles"""
+        all_errors = ""
+        for item in self.error_list.get_children():
+            error_values = self.error_list.item(item, "values")
+            if error_values:
+                all_errors += error_values[0] + "\n"
+        
+        if all_errors:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(all_errors.strip())
+
+
+    def validate_optimized_tac(self, tac_code, original_tac):
+        """Valida que el TAC optimizado conserve todas las variables necesarias"""
+        # Obtener todas las variables declaradas en el original
+        original_vars = set()
+        for line in original_tac:
+            if '=' in line and not line.strip().startswith('print('):
+                var = line.split('=')[0].strip()
+                original_vars.add(var)
+        
+        # Verificar que no falten variables esenciales
+        optimized_vars = set()
+        for line in tac_code:
+            if '=' in line and not line.strip().startswith('print('):
+                var = line.split('=')[0].strip()
+                optimized_vars.add(var)
+        
+        missing_vars = original_vars - optimized_vars
+        if missing_vars:
+            raise ValueError(f"Variables faltantes después de optimizar: {', '.join(missing_vars)}")
 
 if __name__ == "__main__":
     app = CompilerApp()

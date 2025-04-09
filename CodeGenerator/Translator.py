@@ -1,47 +1,61 @@
 class Translator:
-    def __init__(self, tokens):
-        self.tokens = tokens
-        self.translated_code = ""
-        self.indentation = 0  # Controla la indentación
+    def __init__(self, tac_code):
+        self.tac_code = tac_code
+        self.python_code = []
+        self.indent_level = 0
+        self.indent_size = 4
 
     def add_line(self, line):
-        """Agrega una línea al código traducido con la indentación adecuada"""
-        self.translated_code += "    " * self.indentation + line + "\n"
+        """Añade línea con identación correcta"""
+        indented = ' ' * self.indent_level + line
+        self.python_code.append(indented)
 
     def translate(self):
-        token_iter = iter(self.tokens)
-        for token in token_iter:
-            token_type, value = token
-
-            if token_type == "SI":
-                self.add_line("if ")
-            elif token_type == "ENTONCES":
-                self.translated_code = self.translated_code.rstrip() + ":\n"  # Corrige la línea anterior
-                self.indentation += 1
-            elif token_type == "SINO":
-                self.indentation -= 1
-                self.add_line("else:")
-                self.indentation += 1
-            elif token_type == "FIN":
-                self.indentation -= 1
-            elif token_type == "MIENTRAS":
-                self.add_line("while ")
-            elif token_type == "HACER":
-                self.translated_code = self.translated_code.rstrip() + ":\n"
-                self.indentation += 1
-            elif token_type == "MOSTRAR":
-                self.add_line("print(")
-            elif token_type == "PARENTESIS_IZQ":
-                self.translated_code += "("
-            elif token_type == "PARENTESIS_DER":
-                self.translated_code += ")"
-            elif token_type == "ENTRADA":
-                self.add_line("input()")
-            elif token_type == "IDENTIFICADOR":
-                self.translated_code += value + " "
-            elif token_type == "ASIGNACION":
-                self.translated_code += "= "
-            elif token_type in ["LITERAL_NUMERICA", "LITERAL_CADENA", "LITERAL_BOOLEANO"]:
-                self.translated_code += value + " "
-
-        return self.translated_code
+        """Convierte TAC a Python con identación perfecta"""
+        i = 0
+        while i < len(self.tac_code):
+            line = self.tac_code[i].strip()
+            
+            # Manejar fin de bloque
+            if line == '}':
+                self.indent_level = max(0, self.indent_level - self.indent_size)
+                i += 1
+                continue
+                
+            # Manejar estructuras de control
+            if line.endswith(':'):
+                self.add_line(line)
+                self.indent_level += self.indent_size
+                i += 1
+                
+                # Verificar si el siguiente es { y saltarlo
+                if i < len(self.tac_code) and self.tac_code[i].strip() == '{':
+                    i += 1
+                continue
+                
+            # Manejar else
+            if line == 'else:':
+                self.indent_level -= self.indent_size
+                self.add_line('else:')
+                self.indent_level += self.indent_size
+                i += 1
+                
+                # Verificar si el siguiente es { y saltarlo
+                if i < len(self.tac_code) and self.tac_code[i].strip() == '{':
+                    i += 1
+                continue
+                
+            # Ignorar llaves de apertura
+            if line == '{':
+                i += 1
+                continue
+                
+            # Línea normal de código
+            self.add_line(line)
+            i += 1
+        
+        # Validar identación final
+        if self.indent_level != 0:
+            raise ValueError("Error de identación: Bloques no balanceados")
+        
+        return '\n'.join(self.python_code)

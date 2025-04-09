@@ -145,7 +145,6 @@ def p_sentencia_repetir(p):
         condicion=p[5],       # Nodo de la expresión (condición del HASTA_QUE)
         linea=p.lineno(1)     # Línea donde empieza la sentencia
     )
-    print(f"📌 Sentencia REPETIR convertida a AST en línea {p.lineno(1)}")
 
 def p_sentencia_mostrar(p):
     """sentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMA"""
