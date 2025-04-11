@@ -12,6 +12,9 @@ class SemanticAnalyzer:
 
     def analyze(self, ast):
         """Método principal para iniciar el análisis semántico"""
+        self.variables.clear()   # ✅ limpiar estado anterior
+        self.constantes.clear()  # ✅ limpiar constantes también
+        self.errors.clear()  
         if isinstance(ast, NodoPrograma):
             self.visit_program(ast)
         else:
@@ -50,6 +53,14 @@ class SemanticAnalyzer:
             return
 
         # Verificar tipo en asignación si existe
+        # Si es constante, inferir su tipo real y sobrescribir
+        if getattr(node, "es_constante", False):
+            tipo_real = self.visit(node.expresion)
+            node.tipo = tipo_real
+            self.constantes[var_name] = (tipo_real, None, node.linea)
+            return  # No continúa como variable normal
+
+        # Verificar tipo en asignación si existe
         if node.expresion:
             expr_type = self.visit(node.expresion)
             if expr_type and not self._check_type_compatibility(node.tipo, expr_type, "declaración"):
@@ -57,6 +68,7 @@ class SemanticAnalyzer:
                     f"Tipo incompatible en declaración: esperaba '{node.tipo}', obtuvo '{expr_type}'", 
                     node.linea
                 )
+
 
         # Registrar la variable
         self.variables[var_name] = (node.tipo, None, node.linea)
@@ -154,6 +166,8 @@ class SemanticAnalyzer:
         left_type = self.visit(node.izquierda)
         right_type = self.visit(node.derecha)
         
+        print(f"👉 Operación: {node.operador} | Izq: {left_type} | Der: {right_type} (Línea {node.linea})")
+        
         # Validación temprana si hay tipos nulos (por errores previos)
         if left_type is None or right_type is None:
             return None
@@ -165,6 +179,7 @@ class SemanticAnalyzer:
             '-': self._validar_aritmetica,
             '*': self._validar_aritmetica,
             '/': self._validar_aritmetica,
+            '%': self._validar_aritmetica,
             
             # Operadores lógicos
             'AND': self._validar_logica,
@@ -194,10 +209,19 @@ class SemanticAnalyzer:
 
     def _validar_aritmetica(self, node, left_type, right_type):
         """Valida operaciones aritméticas"""
+        if node.operador == '%':
+            if left_type != 'entero' or right_type != 'entero':
+                self._add_error(f"El operador '%' solo acepta operandos enteros", node.linea)
+                return None
+            return 'entero'
+
         if left_type not in ['entero', 'decimal'] or right_type not in ['entero', 'decimal']:
             self._add_error(f"Operación '{node.operador}' no válida para tipos '{left_type}' y '{right_type}'", node.linea)
             return None
+
         return 'decimal' if 'decimal' in [left_type, right_type] else 'entero'
+
+
 
     def _validar_logica(self, node, left_type, right_type):
         """Valida operaciones lógicas"""

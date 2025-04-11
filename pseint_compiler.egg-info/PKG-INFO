@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: pseint_compiler
+Version: 0.1
+Requires-Python: >=3.8
+Requires-Dist: ply>=3.11
+Requires-Dist: colorama>=0.4.6
+Dynamic: requires-dist
+Dynamic: requires-python

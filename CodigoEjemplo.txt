@@ -54,3 +54,38 @@ inicio
     cadena nombre = "Mundo";
     mostrar saludo , nombre;
 fin
+
+
+inicio
+    entero contador = 1;
+    mientras (contador <= 3) hacer
+        mostrar "Iteración:", contador;
+        contador = contador + 1;
+    fin_mientras
+fin
+
+inicio
+    entero i = 0;
+    para i desde 1 hasta 5 hacer
+        mostrar "Valor de i:", i;
+    fin_para
+fin
+
+inicio
+    cadena nombre = "Marvin";
+    entero edad = 21;
+    mostrar "Nombre:", nombre, ", Edad:", edad;
+fin
+
+inicio
+    entero i = 0;
+    mientras (i < 5) hacer
+        si (i != 2 AND i != 4) entonces
+            mostrar "i válido:", i;
+        fin_si
+        i = i + 1;
+    fin_mientras
+fin
+
+
+

@@ -23,6 +23,9 @@ reserved = {
     "hasta_que": "HASTA_QUE",
     "mostrar": "MOSTRAR",
     "hacer": "HACER",
+    "and": "AND",
+    "or": "OR",
+    "not": "NOT",
     
 }
 
@@ -41,16 +44,14 @@ tokens = [
     "RESTA",
     "MULTIPLICACION",
     "DIVISION",
-    "AND",
-    "OR",
-    "NOT",
     "COMA",
     "MAYOR_QUE",       
     "MENOR_QUE",       
     "MAYOR_IGUAL",     
     "MENOR_IGUAL",     
     "IGUAL_IGUAL",     
-    "DIFERENTE",       
+    "DIFERENTE",
+    "MODULO",       
 ] + list(reserved.values())
 
 
@@ -71,7 +72,7 @@ def t_LITERAL_BOOLEANO(t):
 
 def t_IDENTIFICADOR(t):
     r"[a-zA-Z_][a-zA-Z0-9_]*"
-    t.type = reserved.get(t.value, "IDENTIFICADOR")  # Verifica si es palabra reservada
+    t.type = reserved.get(t.value.lower() , "IDENTIFICADOR")  # Verifica si es palabra reservada
     #print(f"📌 Token detectado: {t.type} -> {t.value}")
     #print(f"DEBUG: Token '{t.value}' en línea {t.lineno}")
     return t
@@ -120,9 +121,8 @@ t_SUMA = r'\+'
 t_RESTA = r'-'
 t_MULTIPLICACION = r'\*'
 t_DIVISION = r'/'
-t_AND = r'AND'
-t_OR = r'OR'
-t_NOT = r'NOT'
+t_MODULO = r'%'
+
 
 # Definir los tokens para operadores de comparación
 t_MAYOR_QUE = r'>'

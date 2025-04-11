@@ -63,8 +63,10 @@ class Optimizer:
         """Optimiza conservando solo lo esencial"""
         self.analyze_dependencies(tac_code)
         optimized = []
-        
+
         for i, line in enumerate(tac_code):
+            stripped = line.strip()
+
             # Conservar líneas marcadas como esenciales
             if i in self.keep_lines:
                 optimized.append(line)
@@ -73,5 +75,19 @@ class Optimizer:
                 var = line.split('=')[0].strip()
                 if var in self.essential_vars:
                     optimized.append(line)
-        
-        return optimized
+            # Conservar instrucciones de control como break, continue, pass
+            elif stripped in {"break", "continue", "pass"}:
+                optimized.append(line)
+
+        # 🚨 Post-procesamiento para evitar if vacíos
+        final_code = []
+        for i, line in enumerate(optimized):
+            final_code.append(line)
+            if line.strip().endswith(":"):
+                # Si la siguiente línea no está indentada o es otra estructura de control,
+                # entonces agregamos un 'pass'
+                if i + 1 >= len(optimized) or not optimized[i + 1].startswith("    "):
+                    final_code.append("    pass")
+
+        return final_code
+

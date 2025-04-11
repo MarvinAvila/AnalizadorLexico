@@ -9,14 +9,16 @@ semantic_analyzer = SemanticAnalyzer()
 
 # Definir precedencia para resolver conflictos
 precedence = (
-    ("left", "AND", "OR"),
-    ("left", "SUMA", "RESTA"),
-    ("left", "MULTIPLICACION", "DIVISION"),
+    ("left", "OR"),
+    ("left", "AND"),
     ("right", "NOT"),
-    ("left", "ASIGNACION"),
-    ("left", "PUNTO_COMA"),
-    ("nonassoc", "MAYOR_QUE", "MENOR_QUE", "MAYOR_IGUAL", "MENOR_IGUAL", "IGUAL_IGUAL", "DIFERENTE"),
+    ("left", "SUMA", "RESTA"),
+    ("left", "MULTIPLICACION", "DIVISION", "MODULO"),
+    ("nonassoc", "MAYOR_QUE", "MENOR_QUE", "MAYOR_IGUAL", "MENOR_IGUAL"),
+    ("nonassoc", "IGUAL_IGUAL", "DIFERENTE"),
 )
+
+
 
 # Diccionario de tipos de datos normalizados
 TIPOS_DE_DATOS = {
@@ -87,7 +89,7 @@ def p_sentencia_if(p):
     p[0] = NodoIf(
         condicion=p[3], 
         cuerpo_if=p[6], 
-        cuerpo_else=p[8] if len(p) > 7 else None, 
+        cuerpo_else=p[8] if len(p) == 9 else None, 
         linea=p.lineno(1)
     )
 
@@ -156,56 +158,47 @@ def p_sentencia_mostrar(p):
         linea=p.lineno(1)
     )
 
-def p_expresion(p):
-    """expresion : LITERAL_ENTERO
-                 | LITERAL_DECIMAL
-                 | LITERAL_CADENA
-                 | LITERAL_BOOLEANO
-                 | IDENTIFICADOR
-                 | expresion SUMA expresion
+def p_expresion_binaria(p):
+    '''expresion : expresion SUMA expresion
                  | expresion RESTA expresion
                  | expresion MULTIPLICACION expresion
                  | expresion DIVISION expresion
+                 | expresion MODULO expresion
                  | expresion AND expresion
                  | expresion OR expresion
-                 | NOT expresion
                  | expresion MAYOR_QUE expresion
                  | expresion MENOR_QUE expresion
                  | expresion MAYOR_IGUAL expresion
                  | expresion MENOR_IGUAL expresion
                  | expresion IGUAL_IGUAL expresion
-                 | expresion DIFERENTE expresion
-                 | PARENTESIS_IZQ expresion PARENTESIS_DER"""
-    
-    # --- Caso 1: Literales o identificadores ---
-    if len(p) == 2:
-        if isinstance(p[1], tuple):  # Literal (ej: ("entero", 42))
-            tipo, valor = p[1]
-            p[0] = NodoLiteral(tipo=normalizar_tipo(tipo), valor=valor, linea=p.lineno(1))
-        elif isinstance(p[1], str):  # Identificador (ej: "x")
-            p[0] = NodoIdentificador(nombre=p[1], linea=p.lineno(1))
-        else:
-            raise SyntaxError(f"Tipo de expresión no reconocido: {type(p[1])}")
+                 | expresion DIFERENTE expresion'''
+    p[0] = NodoBinario(
+        operador=p[2],
+        izquierda=p[1],
+        derecha=p[3],
+        linea=p.lineno(2)
+    )
 
-    # --- Caso 2: Expresión entre paréntesis ---
-    elif len(p) == 4 and p[1] == '(' and p[3] == ')':
-        p[0] = p[2]
+def p_expresion_unaria(p):
+    "expresion : NOT expresion"
+    p[0] = NodoUnario(operador="NOT", expresion=p[2], linea=p.lineno(1))
 
-    # --- Caso 3: Operaciones binarias/unarias ---
-    else:
-        if p[1] == 'NOT':
-            if not isinstance(p[2], Nodo):
-                raise SyntaxError(f"Operando de NOT debe ser expresión válida")
-            p[0] = NodoUnario(operador="NOT", expresion=p[2], linea=p.lineno(1))
-        else:
-            if not isinstance(p[1], Nodo) or not isinstance(p[3], Nodo):
-                raise SyntaxError(f"Operandos deben ser expresiones válidas")
-            p[0] = NodoBinario(
-                operador=p[2],
-                izquierda=p[1],
-                derecha=p[3],
-                linea=p.lineno(2)
-            )
+def p_expresion_paren(p):
+    "expresion : PARENTESIS_IZQ expresion PARENTESIS_DER"
+    p[0] = p[2]
+
+def p_expresion_literal(p):
+    '''expresion : LITERAL_ENTERO
+                 | LITERAL_DECIMAL
+                 | LITERAL_CADENA
+                 | LITERAL_BOOLEANO'''
+    tipo, valor = p[1]
+    p[0] = NodoLiteral(tipo=normalizar_tipo(tipo), valor=valor, linea=p.lineno(1))
+
+def p_expresion_identificador(p):
+    "expresion : IDENTIFICADOR"
+    p[0] = NodoIdentificador(nombre=p[1], linea=p.lineno(1))
+
 
 def p_lista_expresiones(p):
     '''lista_expresiones : lista_expresiones COMA expresion
@@ -312,7 +305,7 @@ def p_error(p):
 
 
 # Construcción del Parser
-parser = yacc.yacc(start="programa")
+parser = yacc.yacc(start="programa", debug=False, write_tables=False)
 
 def parse(self, code, **kwargs):
     self.code = code  # Almacenar el contenido del área de texto

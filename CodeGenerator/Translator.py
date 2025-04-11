@@ -1,61 +1,52 @@
+# Translator.py
+from CodeGenerator.SafeFormatter import safe_redbaron_parse
+
+
 class Translator:
     def __init__(self, tac_code):
         self.tac_code = tac_code
-        self.python_code = []
-        self.indent_level = 0
-        self.indent_size = 4
-
-    def add_line(self, line):
-        """Añade línea con identación correcta"""
-        indented = ' ' * self.indent_level + line
-        self.python_code.append(indented)
 
     def translate(self):
-        """Convierte TAC a Python con identación perfecta"""
+        try:
+            # ✅ Solo devolvemos el código generado tal como está
+            return "\n".join(self.tac_code)
+        except Exception as e:
+            raise ValueError(f"Error traduciendo a Python: {str(e)}")
+
+        
+    def _add_minimum_indent(self, code):
+        lines = code.split("\n")
+        result = []
+        indent_level = 0
+        indent_stack = []
+
         i = 0
-        while i < len(self.tac_code):
-            line = self.tac_code[i].strip()
-            
-            # Manejar fin de bloque
-            if line == '}':
-                self.indent_level = max(0, self.indent_level - self.indent_size)
+        while i < len(lines):
+            line = lines[i].rstrip()
+            stripped = line.strip()
+
+            if not stripped:
+                result.append("")  # líneas vacías
                 i += 1
                 continue
-                
-            # Manejar estructuras de control
-            if line.endswith(':'):
-                self.add_line(line)
-                self.indent_level += self.indent_size
+
+            # Detectar estructuras de control
+            if stripped.endswith(":"):
+                result.append("    " * indent_level + stripped)
+                indent_level += 1
+                indent_stack.append(indent_level)
                 i += 1
-                
-                # Verificar si el siguiente es { y saltarlo
-                if i < len(self.tac_code) and self.tac_code[i].strip() == '{':
-                    i += 1
-                continue
-                
-            # Manejar else
-            if line == 'else:':
-                self.indent_level -= self.indent_size
-                self.add_line('else:')
-                self.indent_level += self.indent_size
+
+                # Verificar si la siguiente línea es vacía o mal indentada
+                if i >= len(lines) or not lines[i].strip():
+                    result.append("    " * indent_level + "pass")
+            else:
+                result.append("    " * indent_level + stripped)
                 i += 1
-                
-                # Verificar si el siguiente es { y saltarlo
-                if i < len(self.tac_code) and self.tac_code[i].strip() == '{':
-                    i += 1
-                continue
-                
-            # Ignorar llaves de apertura
-            if line == '{':
-                i += 1
-                continue
-                
-            # Línea normal de código
-            self.add_line(line)
-            i += 1
-        
-        # Validar identación final
-        if self.indent_level != 0:
-            raise ValueError("Error de identación: Bloques no balanceados")
-        
-        return '\n'.join(self.python_code)
+
+                # Si empieza una nueva instrucción de nivel superior, reducir indentación
+                if indent_stack and not stripped.startswith(" "):
+                    indent_level = indent_stack.pop() - 1
+
+        return "\n".join(result)
+

@@ -576,6 +576,7 @@ class CompilerApp:
         
         self.error_list.update_idletasks()
         print("🚀 Análisis finalizado.\n")
+        
     def print_ast(self, node, level=0):
         """Muestra el AST en la consola para depuración"""
         indent = "  " * level
