@@ -87,5 +87,33 @@ inicio
     fin_mientras
 fin
 
+inicio
+    entero x = 6;
+    si ((x % 2) == 0) entonces
+        si (x > 5) entonces
+            mostrar "Par y mayor que 5";
+        sino
+            mostrar "Par pero menor o igual que 5";
+        fin_si
+    sino
+        mostrar "Impar";
+    fin_si
+fin
+
+
+inicio
+    entero x = 10;
+    si ((x > 0) AND ((x % 2) == 0)) entonces
+        mostrar "x es positivo y par";
+    fin_si
+fin
+
+
+inicio
+    para i desde 1 hasta 5 hacer
+        mostrar "Número:", i;
+    fin_para
+fin
+
 
 

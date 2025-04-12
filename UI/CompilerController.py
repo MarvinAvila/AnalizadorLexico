@@ -17,7 +17,12 @@ class CompilerController:
         self.code_editor = code_editor
         self.error_panel = error_panel
         self.console_panel = console_panel
+        
+        self._execution_thread = None
+        self._should_stop = False
+        
         self._setup_parser_callbacks()
+
 
     def _setup_parser_callbacks(self):
         """Configura los callbacks para el parser"""
@@ -42,7 +47,7 @@ class CompilerController:
             tac_code = self._generate_intermediate_code(ast_node)
             optimized_tac = self._optimize_code(tac_code)
             python_code = self._translate_to_python(optimized_tac)
-            
+
             # 3. Ejecución
             self._execute_python_code(python_code)
 
@@ -59,11 +64,11 @@ class CompilerController:
         lexer.lineno = 1
         self.error_panel.clear()
         self.console_panel.clear()
-        self.console_panel.mostrar_en_consola("🚀 Iniciando análisis de código...\n")
+        print("🚀 Iniciando análisis de código...\n")
 
     def _perform_lexical_syntactic_analysis(self, code):
         """Realiza análisis léxico y sintáctico"""
-        self.console_panel.mostrar_en_consola("🔍 Realizando análisis léxico...")
+        print("🔍 Realizando análisis léxico...")
         try:
             lexer.input(code)
             # Solo para verificar que el lexer funciona
@@ -73,7 +78,7 @@ class CompilerController:
             self._add_error("léxico", f"Error léxico: {str(e)}", 0)
             return None
 
-        self.console_panel.mostrar_en_consola("🔍 Realizando análisis sintáctico...")
+        print("🔍 Realizando análisis sintáctico...")
         try:
             ast_node = parser.parse(code, lexer=lexer, tracking=True)
             if not isinstance(ast_node, NodoPrograma):
@@ -86,7 +91,7 @@ class CompilerController:
 
     def _perform_semantic_analysis(self, ast_node):
         """Realiza análisis semántico"""
-        self.console_panel.mostrar_en_consola("🔍 Realizando análisis semántico...")
+        print("🔍 Realizando análisis semántico...")
         try:
             analyzer = SemanticAnalyzer()
             analyzer.analyze(ast_node)
@@ -95,11 +100,10 @@ class CompilerController:
 
     def _generate_intermediate_code(self, ast_node):
         """Genera código de tres direcciones (TAC)"""
-        self.console_panel.mostrar_en_consola("🔧 Generando código intermedio...")
+        print("🔧 Generando código intermedio...")
         try:
             tac_gen = TACGenerator()
             tac_code = tac_gen.generate(ast_node)
-            self._display_tac_code(tac_code, "Original")
             return tac_code
         except Exception as e:
             self._add_error("generación", f"Error generando TAC: {str(e)}", 0)
@@ -107,30 +111,26 @@ class CompilerController:
 
     def _optimize_code(self, tac_code):
         """Optimiza el código intermedio"""
-        self.console_panel.mostrar_en_consola("⚡ Optimizando código...")
+        print("⚡ Optimizando código...")
         try:
             optimizer = Optimizer()
             optimized_tac = optimizer.optimize(tac_code)
-            self._display_tac_code(optimized_tac, "Optimizado")
             return optimized_tac
         except Exception as e:
-            self.console_panel.mostrar_en_consola(f"⚠️ Advertencia de optimización: {str(e)}")
+            print(f"⚠️ Advertencia de optimización: {str(e)}")
             return tac_code  # Fallback al código no optimizado
 
     def _translate_to_python(self, tac_code):
         """Traduce TAC a Python"""
-        self.console_panel.mostrar_en_consola("🔄 Traduciendo a Python...")
+        print("🔄 Traduciendo a Python...")
         try:
             translator = Translator(tac_code)
             python_code = translator.translate()
 
-            print("🐍 Código Python formateado:\n", python_code)  # debug
-            self.console_panel.mostrar_en_consola("\n🐍 Código Python Generado:")
-            self.console_panel.mostrar_en_consola(python_code)
+            print("🐍 Código Python formateado:\n", python_code)
 
             return python_code
 
-            return python_code
 
         except IndentationError as e:
             import re
@@ -156,7 +156,7 @@ class CompilerController:
         try:
             # Validación de sintaxis
             ast.parse(python_code)
-            
+
             # Entorno seguro
             safe_env = {
                 '__builtins__': {
@@ -170,25 +170,27 @@ class CompilerController:
                 'True': True,
                 'False': False
             }
-            
+
             sys.stdout = output_capture = StringIO()
-            
+
             # Ejecución con timeout
             result_queue = Queue()
-            
+
             def execute():
                 try:
+                    safe_env["_should_stop"] = lambda: self._should_stop  # función para consultar estado
                     exec(python_code, safe_env)
                     result_queue.put(("success", output_capture.getvalue()))
                 except Exception as e:
                     result_queue.put(("error", str(e)))
 
-            thread = Thread(target=execute)
-            thread.start()
-            thread.join(timeout=5)  # Timeout de 5 segundos
 
-            if thread.is_alive():
-                thread.join(timeout=0)
+            self._execution_thread = Thread(target=execute)
+            self._execution_thread.start()
+            self._execution_thread.join(timeout=5)
+
+            if self._execution_thread.is_alive():
+                self._execution_thread.join(timeout=0)
                 self._add_error("ejecución", "Tiempo excedido (posible bucle infinito)", 0)
             else:
                 status, result = result_queue.get()
@@ -197,7 +199,7 @@ class CompilerController:
                     self.console_panel.mostrar_en_consola(result)
                 else:
                     self._add_error("ejecución", result, 0)
-                    
+
         except SyntaxError as e:
             self.code_editor.highlight_error_line(e.lineno)
             self._add_error("ejecución", f"Error de sintaxis en línea {e.lineno}: {e.msg}", e.lineno)
@@ -205,12 +207,12 @@ class CompilerController:
             self._add_error("ejecución", f"Error inesperado: {str(e)}", 0)
         finally:
             sys.stdout = old_stdout
-
-    def _display_tac_code(self, tac_code, version):
-        """Muestra el código TAC en la consola"""
-        self.console_panel.mostrar_en_consola(f"\n🔷 Código Intermedio ({version}):")
-        for line in tac_code:
-            self.console_panel.mostrar_en_consola(line)
+            
+    def stop_execution(self):
+        """Detiene la ejecución en curso del código"""
+        if self._execution_thread and self._execution_thread.is_alive():
+            self._should_stop = True
+            self.console_panel.mostrar_en_consola("\n⛔ Ejecución detenida por el usuario.")
 
     def _add_error(self, error_type, message, line):
         """Agrega un error a la lista global"""
@@ -246,11 +248,12 @@ class CompilerController:
 
     def _handle_unexpected_error(self, error):
         """Maneja errores inesperados en el proceso de compilación"""
-        error_msg = f"❌ Error crítico: {str(error)}"
-        self.console_panel.mostrar_en_consola(error_msg)
+        error_msg = str(error)
+        self.error_panel.add_error("sistema", error_msg, 0)
         self._add_error("sistema", error_msg, 0)
         self._display_errors()
-        
+
+
     def _validate_python_code(self, code):
         """Valida que el código Python generado tenga identación correcta"""
         lines = code.split('\n')

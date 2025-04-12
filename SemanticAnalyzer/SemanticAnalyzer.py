@@ -129,21 +129,25 @@ class SemanticAnalyzer:
 
     def visit_nodopara(self, node):
         """Verifica sentencias for"""
-        # Verificar tipos de inicio, fin y paso
+        # Validar tipos de inicio, fin y paso
         inicio_type = self.visit(node.inicio)
         fin_type = self.visit(node.fin)
-        
+
         if inicio_type != "entero" or fin_type != "entero":
             self._add_error("Los límites del 'para' deben ser enteros", node.linea)
-        
+
         if node.paso:
             paso_type = self.visit(node.paso)
             if paso_type != "entero":
                 self._add_error("El paso del 'para' debe ser entero", node.linea)
 
-        # Verificar cuerpo del for
+        # ✅ Registrar la variable de control antes de visitar el cuerpo
+        self.variables[node.variable.nombre] = ("entero", None, node.linea)
+
+        # Visitar cuerpo del ciclo
         for stmt in node.cuerpo:
             self.visit(stmt)
+
             
     def visit_nodorepetir(self, node):
         """Verifica sentencias repetir-hasta"""

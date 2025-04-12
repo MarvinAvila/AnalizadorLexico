@@ -25,11 +25,14 @@ class Optimizer:
                         used_vars.add(token)
             
             # Identificar variables en expresiones
-            if '=' in line:
-                expr = line.split('=')[1].strip()
-                for token in expr.split():
-                    if token.isidentifier() and token not in ['True', 'False']:
-                        used_vars.add(token)
+            if any(op in line for op in ['=', '+=', '-=', '*=', '/=']):
+                parts = line.split('=')
+                if len(parts) >= 2:
+                    expr = parts[1].strip()
+                    for token in expr.split():
+                        if token.isidentifier() and token not in ['True', 'False']:
+                            used_vars.add(token)
+
         
         # Rastrear dependencias hacia atrás
         self.essential_vars = used_vars.copy()
@@ -70,15 +73,20 @@ class Optimizer:
             # Conservar líneas marcadas como esenciales
             if i in self.keep_lines:
                 optimized.append(line)
-            # Conservar asignaciones a variables esenciales
-            elif '=' in line:
-                var = line.split('=')[0].strip()
-                if var in self.essential_vars:
-                    optimized.append(line)
+
+            # Conservar asignaciones y operaciones compuestas a variables esenciales
+            elif any(op in line for op in ['=', '+=', '-=', '*=', '/=']):
+                for op in ['+=', '-=', '*=', '/=', '=']:
+                    if op in line:
+                        var = line.split(op)[0].strip()
+                        if var in self.essential_vars:
+                            optimized.append(line)
+                        break  # Ya procesamos esta línea
+
             # Conservar instrucciones de control como break, continue, pass
             elif stripped in {"break", "continue", "pass"}:
                 optimized.append(line)
-
+                
         # 🚨 Post-procesamiento para evitar if vacíos
         final_code = []
         for i, line in enumerate(optimized):

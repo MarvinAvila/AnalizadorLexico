@@ -129,7 +129,7 @@ class TACGenerator:
         self.emit("while True:")
         self.indent_level += 1
         cond_temp = self.new_temp()
-        self.emit(f"{self._indent()}{cond_temp} = {node.variable.nombre} <= {fin_temp}")
+        self.emit(f"{cond_temp} = {node.variable.nombre} <= {fin_temp}")
         self.emit(f"if not {cond_temp}:")
         self.indent_level += 1
         self.emit(f"break")
