@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
-from CodeEditor import CodeEditor
-from ErrorPanel import ErrorPanel
-from ConsolePanel import ConsolePanel
-from CompilerController import CompilerController
+from UI.CodeEditor import CodeEditor
+from UI.ErrorPanel import ErrorPanel
+from UI.ConsolePanel import ConsolePanel
+from UI.CompilerController import CompilerController
 import sys
 import os
 

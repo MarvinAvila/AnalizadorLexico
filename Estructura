@@ -22,4 +22,9 @@ CompiladorPSeInt/
 │   └── SemanticAnalyzer.py
 │
 └── UI/
+    ├── CodeEditor.py
+    ├── CompilerController.py
+    ├── ConsolePanel.py
+    ├── ErrorrPanel.py
     └── Main.py
+    

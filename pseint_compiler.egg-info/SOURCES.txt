@@ -1,6 +1,7 @@
 README.md
 setup.py
 ./CodeGenerator/Optimizer.py
+./CodeGenerator/SafeFormatter.py
 ./CodeGenerator/TACGenerator.py
 ./CodeGenerator/Translator.py
 ./CodeGenerator/__init__.py
@@ -20,7 +21,6 @@ setup.py
 ./UI/CompilerController.py
 ./UI/ConsolePanel.py
 ./UI/ErrorPanel.py
-./UI/Main anterior.py
 ./UI/Main.py
 ./UI/__init__.py
 CodeGenerator/Optimizer.py
@@ -43,7 +43,6 @@ UI/CodeEditor.py
 UI/CompilerController.py
 UI/ConsolePanel.py
 UI/ErrorPanel.py
-UI/Main anterior.py
 UI/Main.py
 UI/__init__.py
 pseint_compiler.egg-info/PKG-INFO

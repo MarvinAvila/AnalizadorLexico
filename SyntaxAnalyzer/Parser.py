@@ -82,16 +82,14 @@ def normalizar_tipo(tipo):
     """Normaliza un tipo de dato a su formato estándar (minúsculas)."""
     return TIPOS_DE_DATOS.get(tipo.upper(), tipo.lower())
 
-def p_sentencia_if(p):
-    """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI
-                   | SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"""
-    # Generar NodoIf(condicion, cuerpo_if, cuerpo_else, linea)
-    p[0] = NodoIf(
-        condicion=p[3], 
-        cuerpo_if=p[6], 
-        cuerpo_else=p[8] if len(p) == 9 else None, 
-        linea=p.lineno(1)
-    )
+def p_sentencia_if_simple(p):
+    "sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI"
+    p[0] = NodoIf(condicion=p[3], cuerpo_if=p[6], cuerpo_else=[], linea=p.lineno(1))
+
+def p_sentencia_if_con_sino(p):
+    "sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"
+    p[0] = NodoIf(condicion=p[3], cuerpo_if=p[6], cuerpo_else=p[8], linea=p.lineno(1))
+
 
 def p_sentencia_mientras(p):
     """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
@@ -121,24 +119,7 @@ def p_sentencia_para(p):
         paso=paso,
         cuerpo=cuerpo,  # Asegurar que sea lista de declaraciones
         linea=p.lineno(1)
-    )
-
-def p_instrucciones_para(p):
-    """instrucciones_para : instruccion_para
-                         | instrucciones_para instruccion_para"""
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[0] = p[1] + [p[2]]
-
-# Instrucciones específicas para PARA
-def p_instruccion_para(p):
-    """instruccion_para : sentencia_mostrar
-                       | asignacion
-                       | sentencia_if
-                       | sentencia_mientras"""
-    p[0] = p[1]
-    
+    )    
 
 def p_sentencia_repetir(p):
     """sentencia_repetir : REPETIR declaraciones HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
@@ -150,13 +131,16 @@ def p_sentencia_repetir(p):
 
 def p_sentencia_mostrar(p):
     """sentencia_mostrar : MOSTRAR lista_expresiones PUNTO_COMA"""
-    if not p[2]:  # Si lista_expresiones está vacía
-        raise SyntaxError("La sentencia 'mostrar' debe incluir expresiones", p.lineno(1))
-    
-    p[0] = NodoMostrar(
-        expresiones=p[2],
-        linea=p.lineno(1)
-    )
+    if not p[2]:
+        global_errors.append({
+            "tipo": "semántico",
+            "linea": p.lineno(1),
+            "mensaje": "La sentencia 'mostrar' debe incluir al menos una expresión"
+        })
+        p[0] = NodoMostrar(expresiones=[], linea=p.lineno(1))
+    else:
+        p[0] = NodoMostrar(expresiones=p[2], linea=p.lineno(1))
+
 
 def p_expresion_binaria(p):
     '''expresion : expresion SUMA expresion
@@ -279,6 +263,16 @@ def es_tipo_valido(tipo_variable, tipo_valor):
         })
     
     return tipo_valor in tipos_permitidos[tipo_variable]
+
+def p_declaracion_error(p):
+    "declaracion : error PUNTO_COMA"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": p.lineno(1),
+        "mensaje": "Error de sintaxis en una sentencia"
+    })
+    p[0] = Nodo()  # Nodo vacío para evitar romper la compilación
+
 
 
 def p_error(p):

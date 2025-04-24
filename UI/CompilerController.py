@@ -80,6 +80,8 @@ class CompilerController:
 
         print("🔍 Realizando análisis sintáctico...")
         try:
+            # Reiniciar el lexer para el análisis sintáctico
+            lexer.lineno = 1
             ast_node = parser.parse(code, lexer=lexer, tracking=True)
             if not isinstance(ast_node, NodoPrograma):
                 self._add_error("sintáctico", "No se generó un AST válido", 0)
@@ -93,6 +95,8 @@ class CompilerController:
         """Realiza análisis semántico"""
         print("🔍 Realizando análisis semántico...")
         try:
+            #reiniciar el lexer para el análisis semántico
+            lexer.lineno = 1
             analyzer = SemanticAnalyzer()
             analyzer.analyze(ast_node)
         except Exception as e:

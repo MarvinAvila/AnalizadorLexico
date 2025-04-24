@@ -88,7 +88,7 @@ class TACGenerator:
         for stmt in node.cuerpo_if:
             self.generate(stmt)
         self.indent_level -= 1
-        if node.cuerpo_else:
+        if node.cuerpo_else is not None and len(node.cuerpo_else) > 0:
             self.emit("else:")
             self.indent_level += 1
             for stmt in node.cuerpo_else:

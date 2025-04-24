@@ -116,4 +116,24 @@ inicio
 fin
 
 
+//////////////////////////////  CODIGO CON ERRORES ////////////////////////////////////////
 
+inicio
+    entero 123abc = 10;           // ❌ Error léxico: identificador inválido (empieza con número)
+    decimal x = 3.5
+    cadena nombre = "Marvin;
+    booleano bandera = Verdaderooo; // ❌ Error léxico: valor booleano mal escrito
+    
+    si x > 2                      // ❌ Error sintáctico: falta paréntesis y FIN_SI
+        mostrar "X es mayor";
+    
+    y = 5;                        // ❌ Error semántico: variable no declarada
+    nombre = 10;                 // ❌ Error semántico: tipo incompatible (cadena = entero)
+    bandera = "hola";           // ❌ Error semántico: tipo incompatible (booleano = cadena)
+    
+    repetir
+        mostrar nombre;
+    hasta_que x;                 // ❌ Error semántico: condición no booleana
+fin
+
+    
