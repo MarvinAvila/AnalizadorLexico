@@ -1,7 +1,8 @@
 import ply.yacc as yacc
+from ply.yacc import errok
 from LexicalAnalyzer.Lexer import tokens
 from GlobalErrors.ErrorsManager import global_errors
-from SyntaxAnalyzer.AST import Nodo,NodoIf,NodoAsignacion,NodoDeclaracion,NodoBinario,NodoIdentificador,NodoLiteral,NodoMientras,NodoMostrar,NodoRepetir,NodoPara,NodoUnario,NodoPrograma
+from SyntaxAnalyzer.AST import Nodo,NodoIf,NodoAsignacion,NodoDeclaracion,NodoBinario,NodoIdentificador,NodoLiteral,NodoMientras,NodoMostrar,NodoRepetir,NodoPara,NodoUnario,NodoPrograma,NodoError
 from SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
 
 
@@ -85,11 +86,12 @@ def normalizar_tipo(tipo):
 def p_sentencia_if_simple(p):
     "sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones FIN_SI"
     p[0] = NodoIf(condicion=p[3], cuerpo_if=p[6], cuerpo_else=[], linea=p.lineno(1))
+    p[0].tiene_sino = False  # ← agregamos esta bandera
 
 def p_sentencia_if_con_sino(p):
     "sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones SINO declaraciones FIN_SI"
     p[0] = NodoIf(condicion=p[3], cuerpo_if=p[6], cuerpo_else=p[8], linea=p.lineno(1))
-
+    p[0].tiene_sino = True  # ← también aquí
 
 def p_sentencia_mientras(p):
     """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones FIN_MIENTRAS"""
@@ -266,40 +268,293 @@ def es_tipo_valido(tipo_variable, tipo_valor):
 
 def p_declaracion_error(p):
     "declaracion : error PUNTO_COMA"
+    linea = p.lineno(1)
+    mensaje = "Error de sintaxis: se esperaba una sentencia válida"
     global_errors.append({
         "tipo": "sintáctico",
-        "linea": p.lineno(1),
-        "mensaje": "Error de sintaxis en una sentencia"
+        "linea": linea,
+        "mensaje": mensaje
     })
-    p[0] = Nodo()  # Nodo vacío para evitar romper la compilación
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+
+
 
 
 
 def p_error(p):
-    """Manejo de errores de sintaxis sin interrumpir el análisis."""
     if p:
-        # Manejar caso específico de NodoIdentificador mal formado
-        if hasattr(p, 'value') and isinstance(p.value, NodoIdentificador):
-            error_msg = f"Error de sintaxis en línea {p.lineno}: Identificador '{p.value.nombre}' mal formado"
-        else:
-            error_msg = f"Error de sintaxis en línea {p.lineno}: Token inesperado '{p.value}'"
-        
         global_errors.append({
             "tipo": "sintáctico",
             "linea": p.lineno,
-            "mensaje": error_msg
+            "mensaje": f"❌ Error de sintaxis en línea {p.lineno}: se encontró token inesperado '{p.value}' (tipo: {p.type})"
         })
     else:
-        error_msg = "Error de sintaxis: Fin de archivo inesperado"
         global_errors.append({
             "tipo": "sintáctico",
             "linea": 0,
-            "mensaje": error_msg
+            "mensaje": "❌ Error de sintaxis: se alcanzó el fin de archivo sin cerrar correctamente una estructura"
         })
 
 
+
+
+
+
+# Reglas de produccion con manejo de errores para cada sentencia
+# Esto debe añadirse junto con tus reglas normales, no reemplazarlas
+
+# ================================
+# SENTENCIA IF (con errores)
+# ================================
+def p_error_if_sin_condicion(p):
+    """sentencia_if : SI  ENTONCES declaraciones FIN_SI"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'si' no tiene una condición válida entre paréntesis"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok
+
+def p_error_if_sin_entonces(p):
+    """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER declaraciones FIN_SI"""
+    linea = p.lineno(1)
+    mensaje = "❌ Falta la palabra clave 'ENTONCES' después de la condición en la sentencia 'si'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": mensaje
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok 
+
+def p_error_if_sin_declaraciones(p):
+    """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES FIN_SI"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'si' no tiene cuerpo de declaraciones después de ENTONCES"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok
+
+def p_error_if_sin_fin(p):
+    """sentencia_if : SI PARENTESIS_IZQ expresion PARENTESIS_DER ENTONCES declaraciones"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'si' no tiene 'FIN_SI'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok
+
+# ================================
+# SENTENCIA MIENTRAS (con errores)
+# ================================
+def p_error_mientras_sin_condicion(p):
+    """sentencia_mientras : MIENTRAS  HACER declaraciones FIN_MIENTRAS"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mientras' no tiene una condición válida"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok
+
+def p_error_mientras_sin_hacer(p):
+    """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER declaraciones FIN_MIENTRAS"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mientras' no tiene 'HACER'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok
+    
+def p_error_mientras_sin_declaraciones(p):
+    """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER  FIN_MIENTRAS"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mientras' no tiene cuerpo de declaraciones después de HACER"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+def p_error_mientras_si_fin_mientras(p):
+    """sentencia_mientras : MIENTRAS PARENTESIS_IZQ expresion PARENTESIS_DER HACER declaraciones"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mientras' no tiene 'FIN_MIENTRAS'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+# ================================
+# SENTENCIA PARA (con errores)
+# ================================
+def p_error_para_sin_limites(p):
+    """sentencia_para : PARA IDENTIFICADOR HACER declaraciones FIN_PARA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'para' tiene una sintaxis inválida en los límites (DESDE/HASTA)"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_error_para_sin_hacer(p):
+    """sentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion declaraciones FIN_PARA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'para' no tiene 'HACER'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_error_para_sin_declaraciones(p):
+    """sentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER FIN_PARA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'para' no tiene cuerpo de declaraciones después de 'HACER'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_error_para_sin_fin_para(p):
+    """sentencia_para : PARA IDENTIFICADOR DESDE expresion HASTA expresion HACER declaraciones"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'para' no tiene 'FIN_PARA'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+# ================================
+# SENTENCIA REPETIR (con errores)
+# ================================
+def p_error_repetir_sin_condicion(p):
+    """sentencia_repetir : REPETIR declaraciones HASTA_QUE  PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'repetir' no tiene una condición válida en 'HASTA_QUE'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_error_repetir_sin_hasta_que(p):
+    """sentencia_repetir : REPETIR declaraciones  PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'repetir' no tiene 'HASTA_QUE'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+def p_error_repetir_sin_declaraciones(p):
+    """sentencia_repetir : REPETIR  HASTA_QUE PARENTESIS_IZQ expresion PARENTESIS_DER PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'repetir' no tiene cuerpo de declaraciones después de 'REPETIR'"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+# ================================
+# SENTENCIA MOSTRAR (con errores)
+# ================================
+def p_error_mostrar_sin_expresion(p):
+    """sentencia_mostrar : MOSTRAR  PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mostrar' no tiene expresiones válidas para mostrar"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+# ================================
+# DECLARACIONES (con errores)
+# ================================
+def p_error_declaracion_incompleta(p):
+    """declaracion : TIPO  PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Declaración incompleta: falta el identificador o asignación"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+
+# ================================
+# ASIGNACIONES (con errores)
+# ================================
+def p_error_asignacion_invalida(p):
+    """asignacion : IDENTIFICADOR ASIGNACION PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_expresion_error(p):
+    "expresion : error"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": p.lineno(1),
+        "mensaje": "Error en la expresión: sintaxis inválida"
+    })
+    p[0] = NodoLiteral(tipo="entero", valor=0, linea=p.lineno(1))  # Valor de recuperación
+
+
+
+
+
 # Construcción del Parser
-parser = yacc.yacc(start="programa", debug=False, write_tables=False)
+parser = yacc.yacc(start="programa", debug=False, write_tables=True)
 
 def parse(self, code, **kwargs):
     self.code = code  # Almacenar el contenido del área de texto

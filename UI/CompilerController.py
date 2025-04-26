@@ -3,7 +3,7 @@ import ast
 from io import StringIO
 from threading import Thread
 from queue import Queue
-from SyntaxAnalyzer.AST import NodoPrograma
+from SyntaxAnalyzer.AST import NodoPrograma, NodoError
 from GlobalErrors.ErrorsManager import global_errors
 from LexicalAnalyzer.Lexer import lexer
 from SyntaxAnalyzer.Parser import parser, variables, constantes
@@ -31,30 +31,46 @@ class CompilerController:
     def analyze_code(self):
         """Orquesta todo el proceso de compilación"""
         try:
-            # 1. Preparación inicial
             self._prepare_compilation_environment()
             code = self.code_editor.get_code()
 
-            # 2. Pipeline de compilación
+            # 1. Análisis léxico y sintáctico
+            print("🔍 Realizando análisis léxico y sintáctico...")
             ast_node = self._perform_lexical_syntactic_analysis(code)
-            if not ast_node or self._has_errors():
-                return
+            # NO detener, aunque ast_node sea None. Queremos ver todo.
 
-            self._perform_semantic_analysis(ast_node)
+            # 2. Análisis semántico
+            print("🔍 Realizando análisis semántico...")
+            if ast_node:  # Solo hacer semántico si hubo un AST válido
+                self._perform_semantic_analysis(ast_node)
+            # Igual, no detener todavía
+
+            # 3. Verificar errores después de los tres análisis
             if self._has_errors():
-                return
+                print("🚫 Errores detectados. No se generará código.")
+                return  # ⚠️ No continuar si hay errores
 
+            # 4. Generación de código intermedio TAC
+            print("🔧 Generando código intermedio...")
             tac_code = self._generate_intermediate_code(ast_node)
+
+            # 5. Optimización
+            print("⚡ Optimizando código...")
             optimized_tac = self._optimize_code(tac_code)
+
+            # 6. Traducción a Python
+            print("🔄 Traduciendo a Python...")
             python_code = self._translate_to_python(optimized_tac)
 
-            # 3. Ejecución
+            # 7. Ejecución de código
+            print("⚡ Ejecutando código...")
             self._execute_python_code(python_code)
 
         except Exception as e:
             self._handle_unexpected_error(e)
         finally:
             self._display_errors()
+
 
     def _prepare_compilation_environment(self):
         """Reinicia todos los estados para una nueva compilación"""
@@ -68,24 +84,22 @@ class CompilerController:
 
     def _perform_lexical_syntactic_analysis(self, code):
         """Realiza análisis léxico y sintáctico"""
-        print("🔍 Realizando análisis léxico...")
-        try:
-            lexer.input(code)
-            # Solo para verificar que el lexer funciona
-            for _ in lexer:
-                pass
-        except Exception as e:
-            self._add_error("léxico", f"Error léxico: {str(e)}", 0)
-            return None
-
         print("🔍 Realizando análisis sintáctico...")
         try:
-            # Reiniciar el lexer para el análisis sintáctico
-            lexer.lineno = 1
+            lexer.lineno = 1  # Reiniciar contador de líneas
             ast_node = parser.parse(code, lexer=lexer, tracking=True)
-            if not isinstance(ast_node, NodoPrograma):
-                self._add_error("sintáctico", "No se generó un AST válido", 0)
+            
+            # Verificar si el AST es None o contiene NodoError
+            if ast_node is None:
+                self._add_error("sintáctico", "El AST generado es inválido (None)", 0)
                 return None
+            if isinstance(ast_node, NodoError):
+                self._add_error("sintáctico", ast_node.mensaje, ast_node.linea)
+                return None
+            if not isinstance(ast_node, NodoPrograma):
+                self._add_error("sintáctico", "No se generó un programa válido", 0)
+                return None
+            
             return ast_node
         except Exception as e:
             self._add_error("sintáctico", f"Error de sintaxis: {str(e)}", 0)
@@ -277,3 +291,14 @@ class CompilerController:
 
         if indent_stack:
             raise IndentationError("Bloques sin cerrar correctamente")
+    
+    def _ast_has_errors(self, ast_node):
+        """Verifica si el AST contiene nodos de error."""
+        if isinstance(ast_node, NodoError):
+            return True
+        if isinstance(ast_node, NodoPrograma):
+            for decl in ast_node.declaraciones:
+                if isinstance(decl, NodoError):
+                    return True
+        return False
+

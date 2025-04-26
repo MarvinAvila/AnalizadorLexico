@@ -1,6 +1,8 @@
 # AST.py
 class Nodo:
     """Clase base para todos los nodos del AST."""
+    def __init__(self, linea=0):
+        self.linea = linea
     def accept(self, visitor):
         """Patrón Visitor para recorrer el AST."""
         return visitor.visit(self)
@@ -9,8 +11,8 @@ class Nodo:
 class NodoPrograma(Nodo):
     """Nodo raíz del AST. Representa un programa completo."""
     def __init__(self, declaraciones, linea):
+        super().__init__(linea)
         self.declaraciones = declaraciones  # Lista de nodos (declaraciones, if, while, etc.)
-        self.linea = linea
     def __repr__(self):
         return f"{type(self).__name__}(linea={self.linea})"
         
@@ -130,5 +132,12 @@ class NodoUnario(Nodo):
         self.operador = operador  # Operador ("NOT", "-")
         self.expresion = expresion  # NodoExpresion
         self.linea = linea
+    def __repr__(self):
+        return f"{type(self).__name__}(linea={self.linea})"
+    
+class NodoError(Nodo):
+    def __init__(self, mensaje, linea=0):
+        super().__init__(linea)
+        self.mensaje = mensaje
     def __repr__(self):
         return f"{type(self).__name__}(linea={self.linea})"

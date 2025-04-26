@@ -1,8 +1,9 @@
 from SyntaxAnalyzer.AST import (
     NodoPrograma, NodoBinario, NodoLiteral, NodoIdentificador,
     NodoIf, NodoMientras, NodoRepetir, NodoPara, NodoMostrar,
-    NodoDeclaracion, NodoAsignacion, NodoUnario
+    NodoDeclaracion, NodoAsignacion, NodoUnario, NodoError
 )
+from GlobalErrors.ErrorsManager import global_errors
 
 class TACGenerator:
     def __init__(self):
@@ -21,6 +22,11 @@ class TACGenerator:
         self.code.append(f"{indent}{instruction}")
 
     def generate(self, ast_node):
+        """Genera código TAC a partir del AST"""
+        if ast_node is None:
+            raise ValueError("El AST es None")
+        if isinstance(ast_node, NodoError):
+            raise ValueError(f"El AST contiene errores: {ast_node.mensaje}")
         if isinstance(ast_node, NodoPrograma):
             return self.generate_programa(ast_node)
         elif isinstance(ast_node, NodoBinario):
@@ -49,6 +55,8 @@ class TACGenerator:
             raise ValueError(f"Nodo AST no reconocido: {type(ast_node)}")
 
     def generate_programa(self, node):
+        if global_errors:
+            raise Exception("🚫 No se puede generar código intermedio: existen errores en el análisis previo")
         for decl in node.declaraciones:
             self.generate(decl)
         return self.code
