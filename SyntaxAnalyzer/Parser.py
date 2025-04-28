@@ -509,14 +509,38 @@ def p_error_mostrar_sin_expresion(p):
     })
     p[0] = NodoError(mensaje=mensaje, linea=linea)
     errok()
+    
+def p_error_mostrar_sin_punto_coma(p):
+    """sentencia_mostrar : MOSTRAR lista_expresiones"""
+    linea = p.lineno(1)
+    mensaje = "La sentencia 'mostrar' no tiene punto y coma"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
 
 # ================================
 # DECLARACIONES (con errores)
 # ================================
 def p_error_declaracion_incompleta(p):
-    """declaracion : TIPO  PUNTO_COMA"""
+    """declaracion : TIPO PUNTO_COMA"""
     linea = p.lineno(1)
     mensaje = "Declaración incompleta: falta el identificador o asignación"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_error_declaracion_incompleta_punto_coma(p):
+    """declaracion : TIPO IDENTIFICADOR"""
+    linea = p.lineno(1)
+    mensaje = "Declaración incompleta: falta el punto y coma"
     global_errors.append({
         "tipo": "sintáctico",
         "linea": linea,
@@ -531,7 +555,7 @@ def p_error_declaracion_incompleta(p):
 def p_error_asignacion_invalida(p):
     """asignacion : IDENTIFICADOR ASIGNACION PUNTO_COMA"""
     linea = p.lineno(1)
-    mensaje = "Asignación inválida: la expresión no es válida"
+    mensaje = "Asignación inválida: la expresión no es válida "
     global_errors.append({
         "tipo": "sintáctico",
         "linea": linea,
@@ -550,7 +574,83 @@ def p_expresion_error(p):
     p[0] = NodoLiteral(tipo="entero", valor=0, linea=p.lineno(1))  # Valor de recuperación
 
 
+def p_error_asignacion_invalida_punto_coma(p):
+    """asignacion : IDENTIFICADOR ASIGNACION expresion"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el punto y coma"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+def p_declaracion_con_asignacion_sin_tipo(p):
+    """declaracion_con_asignacion :  IDENTIFICADOR ASIGNACION expresion PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el tipo"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+def p_declaracion_con_asignacion_sin_identificador(p):
+    """declaracion_con_asignacion : TIPO ASIGNACION expresion PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el identificador"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+def p_declaracion_con_asignacion_sin_asignacion(p):
+    """declaracion_con_asignacion : TIPO IDENTIFICADOR  expresion PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el signo de asignación '='"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+def p_declaracion_con_asignacion_sin_expresion(p):
+    """declaracion_con_asignacion : TIPO IDENTIFICADOR ASIGNACION  PUNTO_COMA"""
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el valor"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
 
+def p_declaracion_con_asignacion_sin_punto_coma(p):
+    """declaracion_con_asignacion : TIPO IDENTIFICADOR ASIGNACION expresion """
+    linea = p.lineno(1)
+    mensaje = "Asignación inválida: la expresión no es válida y falta el punto y coma"
+    global_errors.append({
+        "tipo": "sintáctico",
+        "linea": linea,
+        "mensaje": f"❌ {mensaje}"
+    })
+    p[0] = NodoError(mensaje=mensaje, linea=linea)
+    errok()
+    
+# def p_expresion_error(p):
+#     "expresion : error"
+#     global_errors.append({
+#         "tipo": "sintáctico",
+#         "linea": p.lineno(1),
+#         "mensaje": "Error en la expresión: sintaxis inválida"
+#     })
+#     p[0] = NodoLiteral(tipo="entero", valor=0, linea=p.lineno(1)) 
 
 
 # Construcción del Parser
